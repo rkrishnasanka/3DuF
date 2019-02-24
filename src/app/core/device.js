@@ -1,18 +1,19 @@
 import Params from "./params";
 
-var Parameters = require("./parameters");
-var Parameter =require("./parameter");
+const Parameters = require("./parameters");
 import Feature from './feature';
-var Registry = require("./registry");
+
+const Registry = require("./registry");
 
 import Layer from './layer';
 import Component from './component';
 import Connection from "./connection";
 
-var StringValue = Parameters.StringValue;
-var FloatValue = Parameters.FloatValue;
+const StringValue = Parameters.StringValue;
 
-/* The Device stores information about a design. */
+/**
+ * The Device stores information about a design.
+ */
 export default class Device {
     constructor(values, name = "New Device") {
         this.layers = [];
@@ -80,8 +81,22 @@ export default class Device {
      */
     removeComponent(component){
         //Remove the component from the map
+        let trydelete;
         let componentid = component.getID();
         let connectiontorefresh = null;
+
+        //Remove component from connections
+        for (let i in this.__connections) {
+            let connection = this.__connections[i];
+            try{
+                trydelete = connection.tryDeleteConnectionTarget(componentid);
+                if(trydelete){
+                    console.log("Removed Component from Connection : " , connection.getID());
+                }
+            }catch (e) {
+                console.error(e);
+            }
+        }
         //Check if the valve map has the component
         if(this.__valveMap.has(componentid)){
             connectiontorefresh = this.getConnectionByID(this.__valveMap.get(componentid));
@@ -239,6 +254,7 @@ export default class Device {
             // console.log(objectID, component.getID());
             if(objectID == component.getID()){
                 component.addFeatureID(featureID);
+                component.placed = true;
                 foundflag = true;
             }
         }
@@ -249,6 +265,7 @@ export default class Device {
             connection = this.__connections[i];
             if(objectID == connection.getID()){
                 connection.addFeatureID(featureID);
+                connection.routed = true;
                 foundflag = true;
             }
         }
@@ -343,10 +360,9 @@ export default class Device {
     __loadConnectionsFromInterchangeV1(connections) {
         let connectiontoload;
         for(let i in connections){
-            connectiontoload = Connection.fromInterchangeV1(connections[i]);
+            connectiontoload = Connection.fromInterchangeV1(this, connections[i]);
             this.__connections.push(connectiontoload);
         }
-        console.log("Connections:", this.__connections);
     }
 
 
@@ -389,22 +405,43 @@ export default class Device {
     }
 
     static fromInterchangeV1(json) {
-        let defaults = json.defaults;
-        let newDevice = new Device({
-            "width": json.params.width,
-            "length": json.params.length
-        }, json.name);
+        let newDevice;
+        if(json.hasOwnProperty("params")){
+            if (json.params.hasOwnProperty("width") && json.params.hasOwnProperty("length")) {
+                newDevice = new Device({
+                    "width": json.params.width,
+                    "length": json.params.length
+                }, json.name);
+            }
+        }else{
+            console.warn("Could not find device params, using some default values for device size");
+            newDevice = new Device({
+                "width": 135000,
+                "length": 85000
+            }, json.name);
+
+        }
         //TODO: Use this to dynamically create enough layers to scroll through
         //newDevice.__loadLayersFromInterchangeV1(json.layers);
         //TODO: Use these two generate a rat's nest
         newDevice.__loadComponentsFromInterchangeV1(json.components);
         newDevice.__loadConnectionsFromInterchangeV1(json.connections);
         //TODO: Use this to render the device features
-        newDevice.__loadFeatureLayersFromInterchangeV1(json.features);
+
+        //Check if JSON has features else mark
+        if(json.hasOwnProperty("features")){
+            newDevice.__loadFeatureLayersFromInterchangeV1(json.features);
+        }else{
+            //We need to add a default layer
+            let newlayer = new Layer(null, "flow");
+            newDevice.addLayer(newlayer);
+            newlayer = new Layer(null, "control");
+            newDevice.addLayer(newlayer);
+
+        }
 
         //Updating cross-references
         let features = newDevice.getAllFeaturesFromDevice();
-        console.log("Features: ",features);
         let feature;
         for(let i in features){
             //console.log("Feature:", features[i]);
@@ -587,6 +624,53 @@ export default class Device {
             let connection = this.__connections[i];
             if(connection.getID() === key){
                 return connection;
+            }
+        }
+    }
+
+    /**
+     * Returns the component given by the user friendly name parameter
+     * return null if nothing is found
+     * @param name
+     * @return {*}
+     */
+    getComponentByName(name){
+        let components = this.getComponents();
+        for(let i in components){
+            if(name == components[i].getName()){
+                return components[i];
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Returns a list of connections that have not been routed yet
+     * @return {Array}
+     */
+    getUnroutedConnections(){
+        let ret = [];
+        let connections = this.getConnections();
+        for(let i in connections){
+            if(!connections[i].routed){
+                ret.push(connections[i]);
+            }
+        }
+        return ret;
+    }
+
+
+    getPositionOfComponentPort(componentport){
+        let component;
+        let components = this.getComponents();
+        for (let i in components) {
+            component = components[i];
+            for(let key of component.ports.keys()){
+                if (componentport.id == component.ports.get(key).id){
+                    //Found the component so return the position
+                    return componentport.calculateAbsolutePosition(component)
+
+                }
             }
         }
     }

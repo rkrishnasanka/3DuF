@@ -3,9 +3,10 @@ import MouseTool from "./mouseTool";
 const Registry = require("../../core/registry");
 import Feature from '../../core/feature';
 import SimpleQueue from "../../utils/simpleQueue";
-const Component = require("../../core/component");
+
 import paper from 'paper';
 import Params from "../../core/params";
+import Component from "../../core/component";
 
 
 
@@ -43,6 +44,11 @@ export default class PositionTool extends MouseTool {
         Registry.currentLayer.addFeature(newFeature);
     }
 
+    /**
+     * Returns the 2D vector of the position of the cursor
+     * @param point
+     * @return {*[]}
+     */
     static getTarget(point) {
         let target = Registry.viewManager.snapToGrid(point);
         return [target.x, target.y];
@@ -65,10 +71,16 @@ export default class PositionTool extends MouseTool {
      * @param featureIDs [String] Feature id's of all the features that will be a part of this component
      */
     createNewComponent(typeString, paramdata, featureIDs) {
-        let params = new Params(null, null, null, paramdata);
+        let definition = Registry.featureSet.getDefinition(typeString);
+        //Clean Param Data
+        let cleanparamdata = {};
+        for(let key in paramdata){
+            cleanparamdata[key] = paramdata[key].getValue();
+        }
+        let params = new Params(cleanparamdata, definition.unique, definition.heritable);
         let componentid = Feature.generateID();
         let name = Registry.currentDevice.generateNewName(typeString);
-        let newComponent = new Component(typeString, params, name , "TEST MINT", componentid);
+        let newComponent = new Component(typeString, params, name , definition.mint, componentid);
         let feature;
 
         for (let i in featureIDs) {
@@ -79,6 +91,13 @@ export default class PositionTool extends MouseTool {
             feature.referenceID = componentid;
 
         }
+
+        let ports = Registry.featureSet.getComponentPorts(cleanparamdata, typeString);
+
+        for(let i in ports){
+            newComponent.setPort(ports[i].label, ports[i]);
+        }
+
 
         Registry.currentDevice.addComponent(newComponent);
         return newComponent;

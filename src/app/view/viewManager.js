@@ -3,6 +3,8 @@ import BorderSettingsDialog from './ui/borderSettingDialog';
 import paper from 'paper';
 
 const Registry = require("../core/registry");
+const Colors = require("./colors");
+
 import Device from '../core/device';
 import ChannelTool from "./tools/channelTool"; //= require("./tools/channelTool");
 
@@ -36,11 +38,27 @@ import CustomComponentPositionTool from "./tools/customComponentPositionTool";
 import CustomComponent from "../core/customComponent";
 import {setButtonColor} from "../utils/htmlUtils";
 import ExportPanel from "./ui/exportPanel";
+import HelpDialog from "./ui/helpDialog";
+import PaperView from "./paperView";
+import AdaptiveGrid from "./grid/adaptiveGrid";
+import Feature from "../core/feature";
+import TaguchiDesigner from "./ui/taguchiDesigner";
+import RightClickMenu from "./ui/rightClickMenu";
 
 export default class ViewManager {
-    constructor(view) {
+
+    /**
+     *
+     * @param view
+     */
+    constructor() {
         this.threeD;
-        this.view = view;
+        this.view = new PaperView("c", this);
+
+        this.__grid = new AdaptiveGrid(this);
+        Registry.currentGrid = this.__grid;
+
+
         this.tools = {};
         this.rightMouseTool = new SelectTool();
         this.customComponentManager = new CustomComponentManager(this);
@@ -51,6 +69,10 @@ export default class ViewManager {
         this.layerToolBar = new LayerToolBar();
         this.messageBox = document.querySelector('.mdl-js-snackbar');
         this.editDeviceDialog = new EditDeviceDialog(this);
+        this.helpDialog = new HelpDialog();
+        this.taguchiDesigner = new TaguchiDesigner(this);
+        this.rightClickMenu = new RightClickMenu();
+        this.__currentDevice = null;
 
         let reference = this;
         this.updateQueue = new SimpleQueue(function() {
@@ -69,7 +91,9 @@ export default class ViewManager {
         this.view.setResizeFunction(function() {
             reference.updateGrid();
             reference.updateAlignmentMarks();
-
+            
+            reference.view.updateRatsNest();
+            reference.view.updateComponentPortsRender();
             reference.updateDevice(Registry.currentDevice);
         });
 
@@ -85,7 +109,10 @@ export default class ViewManager {
         this.minZoom = .0001;
         this.maxZoom = 5;
         this.setupTools();
-        this.activateTool("Channel");
+
+        //TODO: Figure out how remove UpdateQueue as dependency mechanism
+        this.__grid.setColor(Colors.BLUE_500);
+
 
         //Removed from Page Setup
         this.threeD = false;
@@ -97,6 +124,17 @@ export default class ViewManager {
         this.setupDragAndDropLoad("#renderContainer");
         this.switchTo2D();
     }
+
+    /**
+     * Returns the current device the ViewManager is displaying. right now I'm using this to replace the
+     * Registry.currentDevice dependency, however this might change as the modularity requirements change.
+     *
+     * @return {Device}
+     */
+    get currentDevice(){
+        return this.__currentDevice;
+    }
+
 
     /**
      * Initiates the copy operation on the selected feature
@@ -112,6 +150,7 @@ export default class ViewManager {
         //Initiating the zoom toolbar
         this.zoomToolBar = new ZoomToolBar(.0001, 5);
         this.componentToolBar = new ComponentToolBar(this);
+        this.resetToDefaultTool();
     }
 
     addDevice(device, refresh = true) {
@@ -315,6 +354,8 @@ export default class ViewManager {
         this.view.setZoom(zoom);
         this.updateGrid(false);
         this.updateAlignmentMarks();
+        this.view.updateRatsNest();
+        this.view.updateComponentPortsRender();
 
         this.updateDevice(Registry.currentDevice, false);
         this.__updateViewTarget(false);
@@ -407,12 +448,16 @@ export default class ViewManager {
     updateTarget(featureType, featureSet, position, refresh = true) {
         this.view.addTarget(featureType, featureSet, position);
         this.view.updateAlignmentMarks();
+        this.view.updateRatsNest();
+        this.view.updateComponentPortsRender();
         this.refresh(refresh);
     }
 
     __updateViewTarget(refresh = true) {
         this.view.updateTarget();
         this.updateAlignmentMarks();
+        this.view.updateRatsNest();
+        this.view.updateComponentPortsRender();
         this.refresh(refresh);
     }
 
@@ -423,7 +468,8 @@ export default class ViewManager {
             this.view.adjustZoom(delta, point);
             this.updateGrid(false);
             //this.updateAlignmentMarks();
-
+            this.view.updateRatsNest();
+            this.view.updateComponentPortsRender();
             this.updateDevice(Registry.currentDevice, false);
             this.__updateViewTarget(false);
         } else {
@@ -445,7 +491,8 @@ export default class ViewManager {
         this.view.moveCenter(delta);
         this.updateGrid(false);
         // this.updateAlignmentMarks();
-
+        this.view.updateRatsNest();
+        this.view.updateComponentPortsRender();
         this.updateDevice(Registry.currentDevice, false);
         this.refresh(refresh);
     }
@@ -488,27 +535,41 @@ export default class ViewManager {
 
 
     loadDeviceFromJSON(json) {
+        let device;
         Registry.viewManager.clear();
         //Check and see the version number if its 0 or none is present,
         // its going the be the legacy format, else it'll be a new format
-        var version = json.version;
-        if(null == version || undefined == version){
+        let version = json.version;
+        if (null == version || undefined == version) {
             console.log("Loading Legacy Format...");
-            Registry.currentDevice = Device.fromJSON(json);
+            device = Device.fromJSON(json);
+            Registry.currentDevice = device;
+            this.__currentDevice = device;
         }else{
             console.log("Version Number: " + version);
             switch (version){
                 case 1:
-                    Registry.currentDevice = Device.fromInterchangeV1(json);
+                    this.loadCustomComponents(json);
+                    device = Device.fromInterchangeV1(json);
+                    Registry.currentDevice = device;
+                    this.__currentDevice = device;
                     break;
                 default:
                     alert("Version \'" + version + "\' is not supported by 3DuF !");
             }
         }
         //Common Code for rendering stuff
+        // console.log("Feature Layers", Registry.currentDevice.layers);
         Registry.currentLayer = Registry.currentDevice.layers[0];
-        Registry.currentTextLayer = Registry.currentDevice.textLa;
+        Registry.currentTextLayer = Registry.currentDevice.textLayers[0];
+
+        //TODO: Need to replace the need for this function, right now without this, the active layer system gets broken
         Registry.viewManager.addDevice(Registry.currentDevice);
+
+        //In case of MINT exported json, generate layouts for rats nests
+        this.__initializeRatsNest();
+
+
         this.view.initializeView();
         this.updateGrid();
         this.updateDevice(Registry.currentDevice);
@@ -560,6 +621,16 @@ export default class ViewManager {
             let correctType = this.getFeaturesOfType(typeString, setString, selectedFeatures);
             if (correctType.length >0 ){
                 this.adjustAllFeatureParams(valueString, value, correctType);
+            }
+
+            //Check if any components are selected
+            //TODO: modify parameters window to not have chain of updates
+            //Cycle through all components and connections and change the parameters
+            for(let i in this.view.selectedComponents){
+                this.view.selectedComponents[i].updateParameter(valueString, value);
+            }
+            for(let i in this.view.selectedConnections){
+                this.view.selectedConnections[i].updateParameter(valueString, value);
             }
         }else{
             this.updateDefault(typeString, setString, valueString, value);
@@ -640,6 +711,10 @@ export default class ViewManager {
         if(this.tools[toolString] == null){
             throw new Error("Could not find tool with the matching string");
         }
+
+        //Cleanup job when activating new tool
+        this.view.clearSelectedItems();
+
         this.mouseAndKeyboardHandler.leftMouseTool = this.tools[toolString];
         this.mouseAndKeyboardHandler.rightMouseTool = this.tools[rightClickToolString];
         this.mouseAndKeyboardHandler.updateViewMouseEvents();
@@ -762,8 +837,12 @@ export default class ViewManager {
      * Runs cleanup method on the activated tools
      */
     cleanupActiveTools() {
-        this.mouseAndKeyboardHandler.leftMouseTool.cleanup();
-        this.mouseAndKeyboardHandler.rightMouseTool.cleanup();
+        if(this.mouseAndKeyboardHandler.leftMouseTool){
+            this.mouseAndKeyboardHandler.leftMouseTool.cleanup();
+        }
+        if (this.mouseAndKeyboardHandler.rightMouseTool){
+            this.mouseAndKeyboardHandler.rightMouseTool.cleanup();
+        }
     }
 
     /**
@@ -795,8 +874,7 @@ export default class ViewManager {
     }
 
     setupTools() {
-        this.tools["SelectTool"] = new SelectTool();
-        this.tools["MouseSelectTool"] = new MouseSelectTool();
+        this.tools["MouseSelectTool"] = new MouseSelectTool(this.view);
         this.tools["InsertTextTool"] = new InsertTextTool();
         this.tools["Chamber"] = new ComponentPositionTool("Chamber", "Basic");
         this.tools["Valve"] = new ValveInsertionTool("Valve", "Basic");
@@ -836,5 +914,63 @@ export default class ViewManager {
         let customcomponent = this.customComponentManager.getCustomComponent(identifier);
         this.tools[identifier] = new CustomComponentPositionTool(customcomponent, "Custom");
         Registry.featureDefaults["Custom"][identifier] = CustomComponent.defaultParameterDefinitions().defaults;
+    }
+
+    __initializeRatsNest() {
+        //Step 1 generate features for all the components with some basic layout
+        let components = this.currentDevice.getComponents();
+        let xpos = 10000;
+        let ypos = 10000;
+        for(let i in components){
+            let component = components[i];
+            if(!component.placed){
+                this.__generateDefaultPlacementForComponent(
+                    component,
+                    xpos * (parseInt(i) + 1),
+                    ypos * (Math.floor(parseInt(i)/5) +1)
+                );
+            }
+        }
+
+        //TODO: Step 2 generate rats nest renders for all the components
+        
+        this.view.updateRatsNest();
+        this.view.updateComponentPortsRender();
+    }
+
+    __generateDefaultPlacementForComponent(component, xpos, ypos) {
+
+        let params_to_copy = component.getParams().toJSON();
+
+        params_to_copy["position"]  = [xpos, ypos];
+
+        //Get default params and overwrite them with json params, this can account for inconsistencies
+        let nonminttype = Registry.featureSet.getTypeForMINT(component.getType());
+        let newFeature = Feature.makeFeature(nonminttype, "Basic", params_to_copy);
+
+        component.addFeatureID(newFeature.getID());
+
+        Registry.currentLayer.addFeature(newFeature);
+
+        //Set the component position
+        component.updateComponetPosition([xpos, ypos]);
+
+    }
+
+    generateExportJSON(){
+        let json = this.currentDevice.toInterchangeV1();
+        json.customComponents = this.customComponentManager.toJSON();
+        return json;
+    }
+
+    /**
+     * This method attempts to load any custom components that are stored in the custom components property
+     * @param json
+     */
+    loadCustomComponents(json) {
+        if(json.hasOwnProperty("customComponents")){
+            this.customComponentManager.loadFromJSON(json["customComponents"]);
+
+        }
     }
 }

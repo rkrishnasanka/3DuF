@@ -7,8 +7,9 @@ import paper from 'paper';
 
 
 export default class MouseSelectTool extends MouseTool {
-    constructor() {
+    constructor(paperview) {
         super();
+        this.paperView = paperview;
         this.dragging = false;
         this.dragStart = null;
         this.lastPoint = null;
@@ -89,9 +90,8 @@ export default class MouseSelectTool extends MouseTool {
             if (target.selected) {
                 let feat = Registry.currentDevice.getFeatureByID(target.featureID);
                 Registry.viewManager.updateDefaultsFromFeature(feat);
-                let rightclickmenu = new RightClickMenu(feat);
-                rightclickmenu.show(event);
-                Registry.viewManager.rightClickMenu = rightclickmenu;
+                let rightclickmenu = Registry.viewManager.rightClickMenu; //new RightClickMenu(feat);
+                rightclickmenu.show(event, feat);
                 this.rightClickMenu = rightclickmenu;
                 // let func = PageSetup.getParamsWindowCallbackFunction(feat.getType(), feat.getSet());
                 //func(event);
@@ -253,9 +253,8 @@ export default class MouseSelectTool extends MouseTool {
     deselectFeatures() {
         if(this.rightClickMenu){
             this.rightClickMenu.close();
-            this.rightClickMenu = null;
         }
-        paper.project.deselectAll();
+        this.paperView.clearSelectedItems();
         this.currentSelection = [];
     }
 

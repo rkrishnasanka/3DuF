@@ -14,11 +14,13 @@
     <link rel="stylesheet" href="lib/material/material.min.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
     <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Roboto:300,400,500,700" type="text/css">
+    <link rel="stylesheet" href="lib/handsontable/handsontable.full.min.css">
 
     <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
     <link rel="icon" href="favicon.ico" type="image/x-icon">
     <link rel="stylesheet" href="modified.css">
     <link rel="stylesheet" href="animations.css">
+
 </head>
 
 <body>
@@ -587,6 +589,27 @@
     </div>
 </dialog>
 
+<dialog id="doe_dialog" class="mdl-dialog">
+    <div class="mdl-card__title">
+        <h2 class="mdl-card__title-text">Generate Design of Experiments for a Single Component</h2>
+    </div>
+    <div class="mdl-dialog__content">
+        <input type="file" class="upload" id="doe_input" />
+        <div id="taguchi-table"></div>
+    </div>
+    <!--<form action="#">-->
+        <!--<div class="mdl-textfield mdl-js-textfield" width="300px">-->
+            <!--<input class="mdl-textfield__input" type="text" id="new_component_name">-->
+            <!--<label class="mdl-textfield__label" for="new_component_name">Name...</label>-->
+        <!--</div>-->
+    <!--</form>-->
+    <br />
+    <div class="mdl-dialog__actions mdl-dialog__actions--full-width">
+        <button id="download-doe-button" type="button" class="mdl-button">Download Designs</button>
+        <button type="button" class="mdl-button close">Cancel</button>
+    </div>
+</dialog>
+
 <dialog id="edit_device_dialog" class="mdl-dialog">
     <div class="mdl-dialog__content">
         <!-- Textfield with Floating Label -->
@@ -680,66 +703,6 @@
         <button type="button" class="mdl-button close">Cancel</button>
     </div>
 </dialog>
-<script>
-    // var dialog = document.getElementById('edit_device_dialog');
-    // if (! dialog.showModal) {
-    //     dialogPolyfill.registerDialog(dialog);
-    // }
-
-    var isChromium = window.chrome;
-    var winNav = window.navigator;
-    var vendorName = winNav.vendor;
-    var isOpera = typeof window.opr !== "undefined";
-    var isIEedge = winNav.userAgent.indexOf("Edge") > -1;
-    var isIOSChrome = winNav.userAgent.match("CriOS");
-
-    if (isIOSChrome) {
-        // is Google Chrome on IOS
-    } else if(
-        isChromium !== null &&
-        typeof isChromium !== "undefined" &&
-        vendorName === "Google Inc." &&
-        isOpera === false &&
-        isIEedge === false
-    ) {
-        // is Google Chrome
-    } else {
-        // not Google Chrome
-        alert("Warning ! Unsupported browser detected. 3DuF has been developed and tested only in Chrome. " +
-            "The tool may not work correctly on this browser");
-
-    }
-
-
-    var helpdialog = document.querySelector('#help_dialog');
-    var showhelpModalButton = document.querySelector('#infobutton');
-
-    if (! helpdialog.showModal) {
-        dialogPolyfill.registerDialog(helpdialog);
-    }
-
-    showhelpModalButton.addEventListener('click', function() {
-        helpdialog.showModal();
-    });
-
-    helpdialog.querySelector('.close').addEventListener('click', function() {
-        helpdialog.close();
-    });
-
-    var textLabelDialog = document.getElementById('insert_text_dialog');
-    var showTextLabelButton = document.querySelector('#insert_text_button');
-
-    if (! textLabelDialog.showModal) {
-        dialogPolyfill.registerDialog(textLabelDialog);
-    }
-    showTextLabelButton.addEventListener('click', function() {
-        textLabelDialog.showModal();
-    });
-    textLabelDialog.querySelector('.close').addEventListener('click', function() {
-        textLabelDialog.close();
-    });
-
-</script>
 
 
 <!--Snackbar for all user feedback-->
@@ -756,6 +719,13 @@
     gtag('js', new Date());
 
     gtag('config', 'UA-57223580-12');
+</script>
+<script src="https://cdn.trackjs.com/agent/v3/latest/t.js"></script>
+<script>
+    window.TrackJS && TrackJS.install({
+        token: "1f4d3a9c263e4e3fb2fe4c7f96f8808e"
+        // for more configuration options, see https://docs.trackjs.com
+    });
 </script>
 
 </body>

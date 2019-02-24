@@ -5,6 +5,7 @@ import Feature from "../../core/feature";
 import paper from 'paper';
 import Params from "../../core/params";
 import ConnectionTarget from "../../core/connectionTarget";
+import ComponentPort from "../../core/componentPort";
 
 const Registry = require("../../core/registry");
 
@@ -42,7 +43,6 @@ export default class ConnectionTool extends MouseTool {
         }, 20, false);
 
         this.down = function (event) {
-            console.log(event);
             Registry.viewManager.killParamsWindow();
             paper.project.deselectAll();
             console.log("Current State:", ref.__STATE);
@@ -114,9 +114,18 @@ export default class ConnectionTool extends MouseTool {
         this.startPoint = ConnectionTool.getTarget(this.lastPoint);
         this.lastPoint = this.startPoint;
         if(isPointOnComponent){
-            this.source = new ConnectionTarget(isPointOnComponent.getID(), null);
-            //TODO: Modify the waypoint to reflect closest port in the future
-            this.wayPoints.push(this.startPoint);
+            //Modify the waypoint to reflect closest port in the future
+            let componentport = this.__getClosestComponentPort(isPointOnComponent, this.startPoint);
+            if(componentport != null){
+                let location = ComponentPort.calculateAbsolutePosition(componentport, isPointOnComponent);
+                this.source = new ConnectionTarget(isPointOnComponent, componentport.label);
+                this.startPoint = location;
+                this.lastPoint = this.startPoint;
+                this.wayPoints.push(location);
+            }else{
+                this.source = new ConnectionTarget(isPointOnComponent, null);
+                this.wayPoints.push(this.startPoint);
+            }
         } else if (isPointOnConnection){
             console.warn("Implement method to make the connection connections");
             //TODO: Find the current connection we are working with and load it into this tools working memory
@@ -158,6 +167,7 @@ export default class ConnectionTool extends MouseTool {
             let params = new Params(null,null,null, feat.getParams());
             if(this.__currentConnectionObject == null || this.__currentConnectionObject === undefined){
                 let connection = new Connection('Connection', params, Registry.currentDevice.generateNewName('CHANNEL'), 'CHANNEL');
+                connection.routed = true;
                 connection.addFeatureID(feat.getID());
                 connection.addWayPoints(this.wayPoints);
                 feat.referenceID = connection.getID();
@@ -220,15 +230,16 @@ export default class ConnectionTool extends MouseTool {
      * @param isManhatten
      */
     addWayPoint(event, isManhatten) {
+        let connectiontargettoadd;
         let point = MouseTool.getEventPosition(event);
         let isPointOnComponent = this.__isPointOnComponent(point);
         let isPointOnConnection = this.__isPointOnConnection(point);
         let target = ConnectionTool.getTarget(point);
-        if(isManhatten && target){
+        if (isManhatten && target) {
             //TODO: modify the target to find the orthogonal point
             let lastwaypoint = this.startPoint;
-            if(this.wayPoints.length > 0){
-                lastwaypoint = this.wayPoints[this.wayPoints.length -1];
+            if (this.wayPoints.length > 0) {
+                lastwaypoint = this.wayPoints[this.wayPoints.length - 1];
             }
             target = this.getNextOrthogonalPoint(lastwaypoint, target);
         }
@@ -236,20 +247,31 @@ export default class ConnectionTool extends MouseTool {
             this.wayPoints.push(target);
         }
 
-        if(isPointOnComponent){
+        if (isPointOnComponent) {
+            //Modify the waypoint to reflect closest port in the future
+            let componentport = this.__getClosestComponentPort(isPointOnComponent, this.startPoint);
+            if (componentport != null) {
+                let location = ComponentPort.calculateAbsolutePosition(componentport, isPointOnComponent);
+                connectiontargettoadd = new ConnectionTarget(isPointOnComponent, componentport.label);
+                this.wayPoints.pop();
+                this.lastPoint = location;
+            }else {
+                connectiontargettoadd = new ConnectionTarget(isPointOnComponent, null);
+                this.lastPoint = this.wayPoints.pop();
+            }
 
             //Do this if we want to terminate the connection
             //Check if source is empty
             if(this.source == null){
                 //Set is as the source
-                this.source = new ConnectionTarget(isPointOnComponent, null);
+                // console.log("isPointOnComponent", isPointOnComponent);
+                this.source = connectiontargettoadd;
             } else {
                 //Add it to the sinks
-                this.sinks.push(new ConnectionTarget(isPointOnComponent, null));
+                this.sinks.push(connectiontargettoadd);
             }
             this.__STATE = "TARGET";
             this.dragging = false;
-            this.lastPoint = this.wayPoints.pop();
             this.finishChannel();
 
         } else if (isPointOnConnection){
@@ -394,8 +416,27 @@ export default class ConnectionTool extends MouseTool {
         }
 
         for(let i in this.sinks){
+            console.log("Sinks: " ,this.sinks);
             connection.addConnectionTarget(this.sinks[i]);
         }
 
+    }
+
+    __getClosestComponentPort(component, startPoint) {
+        // console.log("Location of startpoint: ",startPoint);
+        let componentports = component.ports;
+        let dist = 1000000000000000;
+        let closest = null;
+        for(let key of componentports.keys()){
+            let componentport = componentports.get(key);
+            let location = ComponentPort.calculateAbsolutePosition(componentport, component);
+            let calc = Math.abs(startPoint[0] - location[0]) + Math.abs(startPoint[1] - location[1]);
+            if(calc < dist){
+                dist = calc;
+                closest = componentport;
+            }
+        }
+
+        return closest;
     }
 }

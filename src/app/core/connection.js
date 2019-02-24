@@ -27,6 +27,24 @@ export default class Connection {
         this.__sinks = [];
         this.__paths = [];
         this.__objects = [];
+        this.__routed = false;
+    }
+
+    get sinks() {
+        return this.__sinks;
+    }
+
+    get source() {
+        return this.__source;
+    }
+
+
+    get routed() {
+        return this.__routed;
+    }
+
+    set routed(value) {
+        this.__routed = value;
     }
 
     /**
@@ -77,8 +95,21 @@ export default class Connection {
         output.id = this.__id;
         output.name = this.__name;
         output.entity = this.__entity;
-        output.source = this.__source;
-        output.sinks = this.__sinks;
+        if(this.__source != null){
+            output.source = this.__source.toJSON();
+        }else{
+            output.source = null;
+        }
+        let sinks = [];
+        if(this.__sinks != null && this.__sinks.length > 0){
+            for(let i in this.__sinks){
+                sinks.push(this.__sinks[i].toJSON());
+            }
+            output.sinks = this.__sinks;
+        }else{
+            output.sinks = null;
+        }
+        output.paths = this.__paths;
         output.params = this.__params.toJSON();
         return output;
     }
@@ -247,20 +278,26 @@ export default class Connection {
      */
     insertFeatureGap(boundingbox){
         //Convert Rectangle to Path.Rectangle
+        console.log(boundingbox);
         boundingbox = new paper.Path.Rectangle(boundingbox);
         //Check which segment I need to break
         let segments = this.getValue("segments");
         for(let i in segments){
             let segment = segments[i];
+            console.log("Segments before:",segments);
             let line = new paper.Path.Line(new paper.Point(segment[0]), new paper.Point(segment[1]));
             let intersections = line.getIntersections(boundingbox);
+            console.log("Intersections found",intersections);
             if(intersections.length === 2){
                 let break1 = intersections[0].point;
                 let break2 = intersections[1].point;
                 let newsegs = this.__breakSegment(segment, break1, break2);
                 segments.splice(i, 1, newsegs[0], newsegs[1]);
+                console.log("Segments after:",segments);
+
             }else if(intersections.length === 1){
                 console.error("There's something funky going on with the intersection, only found 1 intersection");
+                return;
             }
         }
         // console.log("raw new segments:", segments);
@@ -303,7 +340,7 @@ export default class Connection {
      * @param json
      * @returns {*}
      */
-    static fromInterchangeV1(json){
+    static fromInterchangeV1(device, json){
         // let set;
         // if (json.hasOwnProperty("set")) set = json.set;
         // else set = "Basic";
@@ -315,7 +352,7 @@ export default class Connection {
         let entity = json.entity;
         let params = {};
         for(let key in json.params){
-            console.log("key:", key, "value:", json.params[key]);
+            // console.log("key:", key, "value:", json.params[key]);
             let paramobject = Parameter.generateConnectionParameter(key, json.params[key]);
             params[key] = paramobject;
         }
@@ -325,14 +362,21 @@ export default class Connection {
         let connection = new Connection(entity, paramstoadd, name, entity, id);
         if(json.hasOwnProperty("source")){
             if(json.source != null && json.source != undefined){
-                connection.setSource(json.source.component, json.source.port);
+                connection.setSourceFromJSON(device, json.source);
             }
         }
         if(json.hasOwnProperty("sinks")){
             if(json.sinks != null && json.sinks != undefined){
-                for(let i in connection.__sinks){
-                    let sink = connection.__sinks[i];
-                    connection.addSink(sink.component, sink.port);
+                for(let i in json.sinks){
+                    let sink = json.sinks[i];
+                    connection.addSinkFromJSON(device, sink);
+                }
+            }
+        }
+        if(json.hasOwnProperty("paths")){
+            if(json.paths != null && json.paths != undefined){
+                for(let i in json.paths){
+                    connection.addWayPoints(json.paths[i]);
                 }
             }
         }
@@ -377,11 +421,13 @@ export default class Connection {
      * @param port
      */
     addSink(component, port) {
-        if(typeof component != 'string' && !(component instanceof String)){
+        if(typeof component != 'string' || !(component instanceof String)){
             console.error("The reference object value can only be a string")
         }
         this.__sinks.push(new ConnectionTarget(component, port));
     }
+
+
 
     /**
      * Adds a new connection target to either the source or the sinks of the connection object. Requires the user to pass
@@ -402,6 +448,32 @@ export default class Connection {
     }
 
     /**
+     * Tries to delete any connection target reference that uses the said component. Returns true if any corresponding
+     * connection target is found.
+     * @param component
+     * @return boolean
+     */
+    tryDeleteConnectionTarget(componentid){
+        let ret = false;
+        if(component.getID() == componentid){
+            //Remove the source object
+            this.__source = null;
+            ret = true;
+        }
+
+        for(let i in this.__sinks){
+            let sink = this.__sinks[i];
+
+            if(sink.component.getID() == componentid){
+                this.__sinks.splice(i,1);
+                ret = true;
+            }
+        }
+
+        return ret;
+    }
+
+    /**
      * Adds a new set of waypoints to the path field of the connection
      * @param wayPoints
      */
@@ -410,7 +482,7 @@ export default class Connection {
     }
 
     mergeConnection(connection){
-        throw new Error("Merge the newly found connection with the new connection");
+        console.error("Merge the newly found connection with the new connection");
         //TODO:
         /*
         1. Transfer all the paths
@@ -421,4 +493,13 @@ export default class Connection {
          */
     }
 
+    setSourceFromJSON(device,json) {
+        let target = ConnectionTarget.fromJSON(device, json);
+        this.__source = target
+    }
+
+    addSinkFromJSON(device, json) {
+        let target = ConnectionTarget.fromJSON(device, json);
+        this.__sinks.push(target);
+    }
 }

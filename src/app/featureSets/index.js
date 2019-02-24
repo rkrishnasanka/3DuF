@@ -1,7 +1,8 @@
 import * as DXFSolidObjectRenderer2D from "../view/render2D/dxfSolidObjectRenderer2D";
 import CustomComponent from "../core/customComponent";
+import FeatureSet from "./featureSet";
 
-const FeatureSet = require("./featureSet");
+
 const registeredFeatureSets = {};
 const typeStrings = {};
 const Registry = require("../core/registry");
@@ -13,14 +14,13 @@ const requiredSets = {
 
 registerSets(requiredSets);
 
-function makeFeatureSet(set, name) {
-    let newSet = new FeatureSet(set.definitions, set.tools, set.render2D, set.render3D, name);
-    return newSet;
-}
-
 function registerSets(sets) {
     for (let key in sets) {
-        let newSet = makeFeatureSet(sets[key], key);
+        let name = key;
+        let set  = sets[key];
+
+        let newSet = new FeatureSet(set.definitions, set.tools, set.render2D, set.render3D, name);
+        Registry.featureSet = newSet;
         registeredFeatureSets[key] = newSet;
         Registry.featureDefaults[key] = newSet.getDefaults();
     }
@@ -64,8 +64,14 @@ function getRender3D(typeString, setString){
     return set.getRender3D(typeString);
 }
 
+function getComponentPorts(params, typeString, setString="Basic" ){
+    let set = getSet(setString);
+    return set.getComponentPorts(typeString);
+}
+
 module.exports.getSet = getSet;
 module.exports.getDefinition = getDefinition;
 module.exports.getTool = getTool;
 module.exports.getRender2D = getRender2D;
 module.exports.getRender3D = getRender3D;
+module.exports.getComponentPorts = getComponentPorts;
