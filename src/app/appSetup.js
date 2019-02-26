@@ -59,7 +59,7 @@ window.onload = function() {
     if(checkBrowCompatibility()){
         viewManager = new ViewManager();
 
-        if(window.location.host == "3duf.org"){
+        if(window.location.host === "3duf.org"){
             TrackJS.install({
                 token: "1f4d3a9c263e4e3fb2fe4c7f96f8808e"
             });
