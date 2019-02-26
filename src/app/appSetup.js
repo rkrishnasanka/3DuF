@@ -59,7 +59,14 @@ window.onload = function() {
     if(checkBrowCompatibility()){
         viewManager = new ViewManager();
 
+<<<<<<< HEAD
         if(window.location.host === "3duf.org"){
+=======
+
+        console.log("Checking Host: ", window.location.host);
+        if(window.location.host === "3duf.org"){
+            console.log("Enabling TrackJS");
+>>>>>>> dev
             TrackJS.install({
                 token: "1f4d3a9c263e4e3fb2fe4c7f96f8808e"
             });
