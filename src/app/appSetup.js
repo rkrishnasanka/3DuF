@@ -55,8 +55,9 @@ function checkBrowCompatibility(){
 
 window.onload = function() {
 
+    if(true){
 
-    if(checkBrowCompatibility()){
+    // if(checkBrowCompatibility()){
         viewManager = new ViewManager();
 
 
