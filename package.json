@@ -6,7 +6,10 @@
     "babel-cli": "^6.26.0",
     "babelify": "^10.0.0",
     "browserify": "^16.2.2",
-    "watchify": "^3.11.0"
+    "eslint": "^6.8.0",
+    "node-sass": "^4.13.1",
+    "prettier": "1.19.1",
+    "watchify": "^3.11.1"
   },
   "browserify": {
     "transform": [
@@ -22,8 +25,10 @@
   },
   "dependencies": {
     "@dagrejs/graphlib": "^2.1.4",
+    "dialog-polyfill": "^0.5.0",
     "dxf-parser": "^0.6.1",
     "exorcist": "^1.0.1",
+    "fsevents": "^2.1.2",
     "handsontable": "^6.2.2",
     "install": "^0.12.2",
     "jszip": "^2.6.1",
@@ -31,8 +36,9 @@
     "md5": "^2.2.1",
     "node-uuid": ">=1.4.3",
     "nouislider": "^11.1.0",
-    "npm": "^6.7.0",
+    "npm": "^6.14.1",
     "paper": "^0.12.3",
+    "three": "^0.114.0",
     "trackjs": "^3.1.2",
     "wnumb": "^1.1.0"
   },
@@ -48,7 +54,11 @@
     "test": "node_modules/.bin/mocha --recursive --compilers js:babel/register -R spec ./src/test/",
     "watch_compile": "node_modules/.bin/watchify ./src/app/appSetup.js -t babelify -v --outfile ./3DuFapp.js -d -t [ babelify ]",
     "watch_test": "node_modules/.bin/mocha --watch --recursive --compilers js:babel/register -R min ./src/test/",
-    "cover": "node_modules/.bin/istanbul cover node_modules/mocha/bin/_mocha -- -R spec --recursive --compilers js:babel/register ./src/test/"
+    "cover": "node_modules/.bin/istanbul cover node_modules/mocha/bin/_mocha -- -R spec --recursive --compilers js:babel/register ./src/test/",
+    "check_pretty": "prettier --check './src/**/*.js'",
+    "make_pretty": "prettier --write es6 --paerser babel './src/**/*.js'",
+    "eslint":"eslint './src/app/**/*.js'",
+    "eslint_fix":"eslint './src/app/**/*.js' --fix"
   },
   "repository": {
     "type": "git",

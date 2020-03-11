@@ -1,14 +1,13 @@
-const Colors = require("../colors");
+import * as Colors from "../colors";
 import Feature from "../../core/feature";
-const PrimitiveSets2D = require("./primitiveSets2D");
-const FeatureSets = require("../../featureSets");
-import paper from 'paper';
+import * as FeatureSets from "../../featureSets";
+import paper from "paper";
 
 function getLayerColor(feature) {
     let height = feature.getValue("height");
     let layerHeight = 1; // feature.layer.estimateLayerHeight();
     let decimal = height / layerHeight;
-    if (decimal >1) decimal = 1;
+    if (decimal > 1) decimal = 1;
     if (!feature.layer.flip) decimal = 1 - decimal;
     let targetColorSet = Colors.getLayerColors(feature.layer);
     return Colors.decimalToLayerColor(decimal, targetColorSet, Colors.darkColorKeys);
@@ -30,15 +29,11 @@ function getFeatureRenderer(typeString, setString) {
     return rendererInfo;
 }
 
-function getPrimitive2D(typeString, setString) {
-    return PrimitiveSets2D[setString][typeString];
-}
-
 function calculateDistance(pointer_position, feature_position) {
     return Math.sqrt(Math.pow(pointer_position[0] - feature_position.x, 2) + Math.pow(pointer_position[1] - feature_position.y, 2));
 }
 
-function renderAlignmentMarks(position, radius, features) {
+export function renderAlignmentMarks(position, radius, features) {
     // let renderer = getFeatureRenderer(typeString, setString);
     // let params = renderer.targetParams;
     // let prim = getPrimitive2D(renderer.targetPrimitiveType, renderer.targetPrimitiveSet);
@@ -51,13 +46,12 @@ function renderAlignmentMarks(position, radius, features) {
     // let rendered = prim(primParams);
     let alignmentmarkergroup = new paper.Group();
 
-    for(let i in features){
-
+    for (let i in features) {
         let feature = features[i];
-        if(feature == null){
+        if (feature == null) {
             continue;
         }
-        if(calculateDistance(position, feature.getBounds().center) <radius){
+        if (calculateDistance(position, feature.getBounds().center) < radius) {
             //TODO: figure out how check for different kinds of components and then generate
 
             //Generate the alignment H | V lines for each of the features
@@ -77,18 +71,17 @@ function renderAlignmentMarks(position, radius, features) {
             let hpath = new paper.Path(hstart, hend);
             let vpath = new paper.Path(vstart, vend);
 
-            hpath.strokeColor = '#696965';
+            hpath.strokeColor = "#696965";
             hpath.strokeWidth = 500;
-            hpath.strokeCap = 'round';
+            hpath.strokeCap = "round";
 
             hpath.dashArray = [1000, 1200];
 
-            vpath.strokeColor = '#696965';
+            vpath.strokeColor = "#696965";
             vpath.strokeWidth = 500;
-            vpath.strokeCap = 'round';
+            vpath.strokeCap = "round";
 
             vpath.dashArray = [1000, 1200];
-
 
             alignmentmarkergroup.addChild(vpath);
             alignmentmarkergroup.addChild(hpath);
@@ -97,5 +90,3 @@ function renderAlignmentMarks(position, radius, features) {
 
     return alignmentmarkergroup;
 }
-
-module.exports.renderAlignmentMarks = renderAlignmentMarks;

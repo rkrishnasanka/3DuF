@@ -1,4 +1,4 @@
-let render3D = {
+export const render3D = {
     Via: {
         featureParams: {
             position: "position",
@@ -422,7 +422,5 @@ let render3D = {
         },
         featurePrimitiveSet: "Basic3D",
         featurePrimitive: "ConeFeature"
-    },
+    }
 };
-
-module.exports = render3D;

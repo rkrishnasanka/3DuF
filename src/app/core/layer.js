@@ -1,15 +1,11 @@
 import EdgeFeature from "./edgeFeature";
-
-const Parameters = require('./parameters');
-
-import Feature from './feature';
-import TextFeature from './textFeature';
+import Feature from "./feature";
+import TextFeature from "./textFeature";
 import Params from "./params";
 
-const Registry = require("./registry");
+import * as Registry from "./registry";
 
-
-class Layer {
+export default class Layer {
     constructor(values, name = "New Layer") {
         this.params = new Params(values, Layer.getUniqueParameters(), Layer.getHeritableParameters());
         this.name = String(name);
@@ -27,20 +23,20 @@ class Layer {
         if (Registry.viewManager) Registry.viewManager.addFeature(feature);
     }
 
-    updateParameter(key, value){
+    updateParameter(key, value) {
         this.params.updateParameter(key, value);
         if (Registry.viewManager) Registry.viewManager.updateLayer(this);
     }
 
-    setColor(layerColor){
+    setColor(layerColor) {
         this.color = layerColor;
-        if (Registry.viewManager) Registry.viewManager.updateLayer(this); 
+        if (Registry.viewManager) Registry.viewManager.updateLayer(this);
     }
 
-    getIndex(){
-        if(this.device) return this.device.layers.indexOf(this);
+    getIndex() {
+        if (this.device) return this.device.layers.indexOf(this);
     }
-/*
+    /*
     estimateLayerHeight(){
         let dev = this.device;
         let flip = this.params.getValue("flip");
@@ -79,9 +75,9 @@ class Layer {
 
     static getUniqueParameters() {
         return {
-            "z_offset": "Float",
-            "flip": "Boolean"
-        }
+            z_offset: "Float",
+            flip: "Boolean"
+        };
     }
 
     static getHeritableParameters() {
@@ -108,7 +104,7 @@ class Layer {
 
     containsFeature(feature) {
         this.__ensureIsAFeature(feature);
-        return (this.features.hasOwnProperty(feature.getID()));
+        return this.features.hasOwnProperty(feature.getID());
     }
 
     containsFeatureID(featureID) {
@@ -133,7 +129,7 @@ class Layer {
         return output;
     }
 
-    __featuresInterchangeV1(){
+    __featuresInterchangeV1() {
         let output = {};
         for (let i in this.features) {
             output[i] = this.features[i].toInterchangeV1();
@@ -147,8 +143,8 @@ class Layer {
         }
     }
 
-    __loadFeaturesFromInterchangeV1(json){
-        for(let i in json){
+    __loadFeaturesFromInterchangeV1(json) {
+        for (let i in json) {
             this.addFeature(Feature.fromInterchangeV1(json[i]));
         }
     }
@@ -178,25 +174,22 @@ class Layer {
         }
         let newLayer = new Layer(json.params, json.name);
         newLayer.__loadFeaturesFromJSON(json.features);
-        if(json.color) newLayer.color = json.color;
+        if (json.color) newLayer.color = json.color;
         return newLayer;
     }
 
-    static fromInterchangeV1(json){
+    static fromInterchangeV1(json) {
         //TODO: Need to be able to through all the features in the layer
         if (!json.hasOwnProperty("features")) {
             throw new Error("JSON layer has no features!");
         }
         let newLayer = new Layer(json.params, json.name);
         newLayer.__loadFeaturesFromInterchangeV1(json.features);
-        if(json.color) newLayer.color = json.color; //TODO: Figure out if this needs to change in the future
+        if (json.color) newLayer.color = json.color; //TODO: Figure out if this needs to change in the future
         return newLayer;
-
     }
 
     render2D(paperScope) {
         return this.__renderFeatures2D();
     }
 }
-
-module.exports = Layer;

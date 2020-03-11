@@ -1,4 +1,4 @@
-let render2D = {
+export const render2D = {
     Via: {
         featureParams: {
             position: "position",
@@ -17,10 +17,10 @@ let render2D = {
     Port: {
         featureParams: {
             position: "position",
-            portRadius: "portRadius",
+            portRadius: "portRadius"
         },
         targetParams: {
-            portRadius: "portRadius",
+            portRadius: "portRadius"
         },
         featurePrimitiveSet: "Basic2D",
         featurePrimitiveType: "GradientCircle",
@@ -273,9 +273,9 @@ let render2D = {
             orientation: "orientation",
             flowChannelWidth: "flowChannelWidth",
             radius: "radius",
-            valveWidth:"valveWidth",
-            valveLength:"valveLength",
-            valveSpacing:"valveSpacing",
+            valveWidth: "valveWidth",
+            valveLength: "valveLength",
+            valveSpacing: "valveSpacing",
             height: "height"
         },
         targetParams: {
@@ -283,9 +283,9 @@ let render2D = {
             orientation: "orientation",
             flowChannelWidth: "flowChannelWidth",
             radius: "radius",
-            valveWidth:"valveWidth",
-            valveLength:"valveLength",
-            valveSpacing:"valveSpacing",
+            valveWidth: "valveWidth",
+            valveLength: "valveLength",
+            valveSpacing: "valveSpacing",
             height: "height"
         },
         featurePrimitiveSet: "Basic2D",
@@ -299,20 +299,20 @@ let render2D = {
             orientation: "orientation",
             flowChannelWidth: "flowChannelWidth",
             radius: "radius",
-            valveWidth:"valveWidth",
-            valveLength:"valveLength",
-            valveSpacing:"valveSpacing",
-            height:"height"
+            valveWidth: "valveWidth",
+            valveLength: "valveLength",
+            valveSpacing: "valveSpacing",
+            height: "height"
         },
         targetParams: {
             position: "position",
             orientation: "orientation",
             flowChannelWidth: "flowChannelWidth",
             radius: "radius",
-            valveWidth:"valveWidth",
-            valveLength:"valveLength",
-            valveSpacing:"valveSpacing",
-            height:"height"
+            valveWidth: "valveWidth",
+            valveLength: "valveLength",
+            valveSpacing: "valveSpacing",
+            height: "height"
         },
         featurePrimitiveSet: "Basic2D",
         featurePrimitiveType: "RotaryMixer_control",
@@ -439,7 +439,6 @@ let render2D = {
             length: "length",
             width: "width",
             rotation: "rotation"
-
         },
         featurePrimitiveSet: "Basic2D",
         featurePrimitiveType: "Valve",
@@ -564,7 +563,7 @@ let render2D = {
             width: "width",
             leafs: "leafs",
             stageLength: "stageLength",
-            direction : "direction"
+            direction: "direction"
         },
         targetParams: {
             flowChannelWidth: "flowChannelWidth",
@@ -573,7 +572,7 @@ let render2D = {
             width: "width",
             leafs: "leafs",
             stageLength: "stageLength",
-            direction:"direction"
+            direction: "direction"
         },
         featurePrimitiveType: "Tree",
         featurePrimitiveSet: "Basic2D",
@@ -589,7 +588,7 @@ let render2D = {
             width: "width",
             leafs: "leafs",
             stageLength: "stageLength",
-            direction : "direction"
+            direction: "direction"
         },
         targetParams: {
             flowChannelWidth: "flowChannelWidth",
@@ -598,7 +597,7 @@ let render2D = {
             width: "width",
             leafs: "leafs",
             stageLength: "stageLength",
-            direction:"direction"
+            direction: "direction"
         },
         featurePrimitiveType: "YTree",
         featurePrimitiveSet: "Basic2D",
@@ -616,7 +615,7 @@ let render2D = {
             length: "length",
             leafs: "leafs",
             stageLength: "stageLength",
-            direction : "direction"
+            direction: "direction"
         },
         targetParams: {
             flowChannelWidth: "flowChannelWidth",
@@ -626,7 +625,7 @@ let render2D = {
             length: "length",
             leafs: "leafs",
             stageLength: "stageLength",
-            direction:"direction"
+            direction: "direction"
         },
         featurePrimitiveType: "Mux",
         featurePrimitiveSet: "Basic2D",
@@ -644,7 +643,7 @@ let render2D = {
             length: "length",
             leafs: "leafs",
             stageLength: "stageLength",
-            direction : "direction"
+            direction: "direction"
         },
         targetParams: {
             flowChannelWidth: "flowChannelWidth",
@@ -654,7 +653,7 @@ let render2D = {
             length: "length",
             leafs: "leafs",
             stageLength: "stageLength",
-            direction:"direction"
+            direction: "direction"
         },
         featurePrimitiveType: "Mux_control",
         featurePrimitiveSet: "Basic2D",
@@ -735,7 +734,7 @@ let render2D = {
             outputWidth: "outputWidth",
             outputLength: "outputLength",
             height: "height",
-            rotation:"rotation"
+            rotation: "rotation"
         },
         featurePrimitiveSet: "Basic2D",
         featurePrimitiveType: "DropletGen",
@@ -751,13 +750,11 @@ let render2D = {
         },
         targetParams: {
             height: "height",
-            rotation:"rotation"
+            rotation: "rotation"
         },
         featurePrimitiveSet: "Basic2D",
         featurePrimitiveType: "blah",
         targetPrimitiveType: "blah",
         targetPrimitiveSet: "Basic2D"
-    },
+    }
 };
-
-module.exports = render2D;
