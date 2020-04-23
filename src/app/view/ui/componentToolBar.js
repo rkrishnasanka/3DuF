@@ -37,6 +37,7 @@ export default class ComponentToolBar {
         this.__curvedmixerButton = document.getElementById("curvedmixer_button");
         this.__mixerButton = document.getElementById("mixer_button");
         this.__gradientGeneratorButton = document.getElementById("gradientgenerator_button");
+        this.__thermoCyclerButton = document.getElementById("thermoCycler_button")
         this.__treeButton = document.getElementById("tree_button");
         this.__ytreeButton = document.getElementById("ytree_button");
         this.__muxButton = document.getElementById("mux_button");
@@ -48,19 +49,15 @@ export default class ComponentToolBar {
         this.__alignmentMarksButton = document.getElementById("alignmentmarks_button");
         this.__llChamberButton = document.getElementById("llchamber_button");
         this.__threeDMixerButton = document.getElementById("3dmixer_button");
-<<<<<<< HEAD
         this.__pcrChamberButton = document.getElementById("pcrchamber_button");
         this.__rtChamberButton = document.getElementById("rtchamber_button");
-
-        // *** david was here
         this.__sideSlotButton = document.getElementById("sideSlot_button");
-=======
         this.__RNAExtractionChamber = document.getElementById("RNAExtractionChamber_button");
->>>>>>> arnaoutleen
 
         //Create all the parameter menu buttons
 
         this.__channelParams = document.getElementById("channel_params_button");
+        this.__thermoCyclerParams = document.getElementById("thermoCycler_params_button");
         this.__connectionParams = document.getElementById("connection_params_button");
         this.__roundedChannelParams = document.getElementById("roundedchannel_params_button");
         this.__transitionParams = document.getElementById("transition_params_button");
@@ -90,15 +87,10 @@ export default class ComponentToolBar {
         this.__alignmentMarksParams = document.getElementById("alignmentmarks_params_button");
         this.__llChamberParams = document.getElementById("llchamber_params_button");
         this.__threeDMixerParams = document.getElementById("3dmixer_params_button");
-<<<<<<< HEAD
         this.__pcrChamberParams = document.getElementById("pcrchamber_params_button");
         this.__rtChamberParams = document.getElementById("rtchamber_params_button");
-
-        // *** david was here
         this.__sideSlotParams = document.getElementById("sideSlot_params_buttom");
-=======
         this.__RNAExtractionChamberParams = document.getElementById("RNAExtractionChamber_params_button");
->>>>>>> arnaoutleen
 
         this.__insertTextDialog = new InsertTextDialog();
 
@@ -127,6 +119,7 @@ export default class ComponentToolBar {
             Tree: this.__treeButton,
             YTree: this.__ytreeButton,
             Mux: this.__muxButton,
+            thermoCycler: this.__thermoCyclerButton,
             Transposer: this.__transposerButton,
             RotaryMixer: this.__rotarymixerButton,
             DropletGen: this.__dropletgenButton,
@@ -144,6 +137,7 @@ export default class ComponentToolBar {
         this.__setupEventHandlers();
 
         this.__setupParamButtonEventHandlers();
+        
     }
 
     __setupEventHandlers() {
@@ -208,7 +202,7 @@ export default class ComponentToolBar {
             ref.setActiveButton("Pump3D");
             ref.__viewManagerDelegate.switchTo2D();
         };
-
+        
         this.__alignmentMarksButton.onclick = function() {
             Registry.viewManager.activateTool("AlignmentMarks");
 
@@ -294,7 +288,12 @@ export default class ComponentToolBar {
             ref.setActiveButton("GradientGenerator");
             ref.__viewManagerDelegate.switchTo2D();
         };
+        this.__thermoCyclerButton.onclick = function() {
+          Registry.viewManager.activateTool("thermoCycler");
 
+          ref.setActiveButton("thermoCycler");
+          ref.__viewManagerDelegate.switchTo2D();
+        };
         this.__treeButton.onclick = function() {
             Registry.viewManager.activateTool("Tree");
 
@@ -435,18 +434,11 @@ export default class ComponentToolBar {
         this.__alignmentMarksParams.onclick = ComponentToolBar.getParamsWindowCallbackFunction("AlignmentMarks", "Basic");
         this.__llChamberParams.onclick = ComponentToolBar.getParamsWindowCallbackFunction("LLChamber", "Basic");
         this.__threeDMixerParams.onclick = ComponentToolBar.getParamsWindowCallbackFunction("3DMixer", "Basic");
-<<<<<<< HEAD
-<<<<<<< HEAD
         this.__pcrChamberParams.onclick = ComponentToolBar.getParamsWindowCallbackFunction("PCRChamber", "Basic");
         this.__rtChamberParams.onclick = ComponentToolBar.getParamsWindowCallbackFunction("RTChamber", "Basic");
-=======
-
-        // *** david was here
         this.__sideSlotParams.onclick = ComponentToolBar.getParamsWindowCallbackFunction("SideSlot", "Basic");
->>>>>>> hkim42-pull-request-hkim42
-=======
         this.__RNAExtractionChamberParams.onclick = ComponentToolBar.getParamWindowCallbackFunction("RNAExtractionChamber","Basic")
->>>>>>> arnaoutleen
+        this.__thermoCyclerParams.onclick = ComponentToolBar.getParamsWindowCallbackFunction("thermoCycler", "Basic");
     }
 
     static getParamsWindowCallbackFunction(typeString, setString, isTranslucent = false) {
