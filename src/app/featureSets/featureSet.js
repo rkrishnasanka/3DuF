@@ -29,6 +29,9 @@ import ThreeDMixer from "../library/threeDMixer";
 import PCRChamber from "../library/pcrChamber";
 import RTChamber from "../library/rtChamber";
 
+// *** david was here
+import SideSlot from "../library/sideSlot";
+
 export default class FeatureSet {
     constructor(definitions, tools, render2D, render3D, setString) {
         this.__definitions = definitions;
@@ -84,6 +87,8 @@ export default class FeatureSet {
             PCRChamber_control: { object: new PCRChamber(), key: "CONTROL" },
             RTChamber: { object: new RTChamber(), key: "FLOW" },
             RTChamber_control: { object: new RTChamber(), key: "CONTROL" },
+            "SideSlot": { object: new SideSlot(), key: "FLOW" },
+            "SideSlot_control": { object: new SideSlot(), key: "CONTROL" }
         };
 
         // this.__checkDefinitions();

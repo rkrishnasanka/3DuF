@@ -919,6 +919,7 @@ export default class ViewManager {
         this.tools["3DMixer"] = new MultilayerPositionTool("3DMixer", "Basic");
         this.tools["PCRChamber"] = new MultilayerPositionTool("PCRChamber", "Basic");
         this.tools["RTChamber"] = new MultilayerPositionTool("RTChamber", "Basic");
+        this.tools["SideSlot"] = new MultilayerPositionTool("SideSlot", "Basic");
 
         //All the new tools
         this.tools["MoveTool"] = new MoveTool();
