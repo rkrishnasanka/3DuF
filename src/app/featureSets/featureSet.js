@@ -28,9 +28,8 @@ import LLChamber from "../library/llChamber";
 import ThreeDMixer from "../library/threeDMixer";
 import PCRChamber from "../library/pcrChamber";
 import RTChamber from "../library/rtChamber";
-
-// *** david was here
 import SideSlot from "../library/sideSlot";
+import RNAExtractionChamber from "../library/RNAExtractionChamber";
 
 export default class FeatureSet {
     constructor(definitions, tools, render2D, render3D, setString) {
@@ -88,7 +87,9 @@ export default class FeatureSet {
             RTChamber: { object: new RTChamber(), key: "FLOW" },
             RTChamber_control: { object: new RTChamber(), key: "CONTROL" },
             "SideSlot": { object: new SideSlot(), key: "FLOW" },
-            "SideSlot_control": { object: new SideSlot(), key: "CONTROL" }
+            "SideSlot_control": { object: new SideSlot(), key: "CONTROL" },
+            RNAExtractionChamber: { object: new RNAExtractionChamber(), key: "FLOW" },
+            RNAExtractionChamber_control: { object: new RNAExtractionChamber(), key: "CONTROL" },
         };
 
         // this.__checkDefinitions();

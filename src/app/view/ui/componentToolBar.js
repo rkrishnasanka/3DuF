@@ -47,11 +47,15 @@ export default class ComponentToolBar {
         this.__alignmentMarksButton = document.getElementById("alignmentmarks_button");
         this.__llChamberButton = document.getElementById("llchamber_button");
         this.__threeDMixerButton = document.getElementById("3dmixer_button");
+<<<<<<< HEAD
         this.__pcrChamberButton = document.getElementById("pcrchamber_button");
         this.__rtChamberButton = document.getElementById("rtchamber_button");
 
         // *** david was here
         this.__sideSlotButton = document.getElementById("sideSlot_button");
+=======
+        this.__RNAExtractionChamber = document.getElementById("RNAExtractionChamber_button");
+>>>>>>> arnaoutleen
 
         //Create all the parameter menu buttons
 
@@ -84,11 +88,15 @@ export default class ComponentToolBar {
         this.__alignmentMarksParams = document.getElementById("alignmentmarks_params_button");
         this.__llChamberParams = document.getElementById("llchamber_params_button");
         this.__threeDMixerParams = document.getElementById("3dmixer_params_button");
+<<<<<<< HEAD
         this.__pcrChamberParams = document.getElementById("pcrchamber_params_button");
         this.__rtChamberParams = document.getElementById("rtchamber_params_button");
 
         // *** david was here
         this.__sideSlotParams = document.getElementById("sideSlot_params_buttom");
+=======
+        this.__RNAExtractionChamberParams = document.getElementById("RNAExtractionChamber_params_button");
+>>>>>>> arnaoutleen
 
         this.__insertTextDialog = new InsertTextDialog();
 
@@ -126,7 +134,8 @@ export default class ComponentToolBar {
             "3DMixer": this.__threeDMixerButton,
             PCRChamber: this.__pcrChamberButton,
             RTChamber: this.__rtChamberButton,
-            "SideSlot": this.__sideSlotButton
+            "SideSlot": this.__sideSlotButton,
+            RNAExtractionChamber: this.__RNAExtractionChamberButton
         };
 
         this.__setupEventHandlers();
@@ -218,19 +227,19 @@ export default class ComponentToolBar {
             ref.__viewManagerDelegate.switchTo2D();
         };
         
-        this.__anodeButton.onclick = function() {//ck
-            Registry.viewManager.activateTool("Anode");//ck
+        this.__anodeButton.onclick = function() {
+            Registry.viewManager.activateTool("Anode");
 
-            ref.setActiveButton("Anode");//ck
-            ref.__viewManagerDelegate.switchTo2D();//ck
-        };//ck
+            ref.setActiveButton("Anode");
+            ref.__viewManagerDelegate.switchTo2D();
+        };
 
-        this.__cathodeButton.onclick = function() {//ck
-            Registry.viewManager.activateTool("Cathode");//ck
+        this.__cathodeButton.onclick = function() {
+            Registry.viewManager.activateTool("Cathode");
 
-            ref.setActiveButton("Cathode");//ck
-            ref.__viewManagerDelegate.switchTo2D();//ck
-        };//ck
+            ref.setActiveButton("Cathode");
+            ref.__viewManagerDelegate.switchTo2D();
+        };
 
         // this.__viaButton.onclick = function() {
         //     Registry.viewManager.activateTool("Via");
@@ -338,8 +347,6 @@ export default class ComponentToolBar {
             ref.setActiveButton("LLChamber");
             ref.__viewManagerDelegate.switchTo2D();
         };
-
-<<<<<<< HEAD
         this.__pcrChamberButton.onclick = function() {
             Registry.viewManager.activateTool("PCRChamber");
 
@@ -351,15 +358,22 @@ export default class ComponentToolBar {
             Registry.viewManager.activateTool("RTChamber");
 
             ref.setActiveButton("RTChamber");
-=======
-        // *** david was here
+        };
+
         this.__sideSlotButton.onclick = function() {
             Registry.viewManager.activateTool("SideSlot");
 
             ref.setActiveButton("SideSlot");
->>>>>>> hkim42-pull-request-hkim42
-            ref.__viewManagerDelegate.switchTo2D();
         };
+
+        this.__RNAExtractionChamber.onclick = function() {
+            Registry.viewManager.activateTool("RNAExtractionChamber");
+
+            ref.setActiveButton("RNAExtractionChamber");
+        };
+        
+        
+        ref.__viewManagerDelegate.switchTo2D();
     }
 
     setActiveButton(feature) {
@@ -411,6 +425,7 @@ export default class ComponentToolBar {
         this.__llChamberParams.onclick = ComponentToolBar.getParamsWindowCallbackFunction("LLChamber", "Basic");
         this.__threeDMixerParams.onclick = ComponentToolBar.getParamsWindowCallbackFunction("3DMixer", "Basic");
 <<<<<<< HEAD
+<<<<<<< HEAD
         this.__pcrChamberParams.onclick = ComponentToolBar.getParamsWindowCallbackFunction("PCRChamber", "Basic");
         this.__rtChamberParams.onclick = ComponentToolBar.getParamsWindowCallbackFunction("RTChamber", "Basic");
 =======
@@ -418,6 +433,9 @@ export default class ComponentToolBar {
         // *** david was here
         this.__sideSlotParams.onclick = ComponentToolBar.getParamsWindowCallbackFunction("SideSlot", "Basic");
 >>>>>>> hkim42-pull-request-hkim42
+=======
+        this.__RNAExtractionChamberParams.onclick = ComponentToolBar.getParamWindowCallbackFunction("RNAExtractionChamber","Basic")
+>>>>>>> arnaoutleen
     }
 
     static getParamsWindowCallbackFunction(typeString, setString, isTranslucent = false) {

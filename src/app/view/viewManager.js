@@ -920,6 +920,8 @@ export default class ViewManager {
         this.tools["PCRChamber"] = new MultilayerPositionTool("PCRChamber", "Basic");
         this.tools["RTChamber"] = new MultilayerPositionTool("RTChamber", "Basic");
         this.tools["SideSlot"] = new MultilayerPositionTool("SideSlot", "Basic");
+        this.tools["RNAExtractionChamber"] = new MultilayerPositionTool("RNAExtractionChamber","Basic");
+
 
         //All the new tools
         this.tools["MoveTool"] = new MoveTool();

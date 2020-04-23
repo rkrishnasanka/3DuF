@@ -59,8 +59,8 @@
     "cover": "node_modules/.bin/istanbul cover node_modules/mocha/bin/_mocha -- -R spec --recursive --compilers js:babel/register ./src/test/",
     "check_pretty": "prettier --check './src/**/*.js'",
     "make_pretty": "prettier --write es6 --paerser babel './src/**/*.js'",
-    "eslint":"eslint './src/app/**/*.js'",
-    "eslint_fix":"eslint './src/app/**/*.js' --fix"
+    "eslint": "eslint './src/app/**/*.js'",
+    "eslint_fix": "eslint './src/app/**/*.js' --fix"
   },
   "repository": {
     "type": "git",
