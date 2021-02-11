@@ -12,27 +12,27 @@ export default class Valve3D extends Template {
         };
 
         this.__heritable = {
-            orientation: "String",
+            componentSpacing: "Float",
+            rotation: "Float",
             valveRadius: "Float",
             height: "Float",
             gap: "Float",
             width: "Float",
-            length: "Float",
-            rotation: "Float"
+            length: "Float"
         };
 
         this.__defaults = {
-            orientation: "V",
+            componentSpacing: 1000,
+            rotation: 0,
             valveRadius: 1.2 * 1000,
             height: 250,
             gap: 0.6 * 1000,
             width: 2.4 * 1000,
-            length: 2.4 * 1000,
-            rotation: 0
+            length: 2.4 * 1000
         };
 
         this.__units = {
-            orientation: "",
+            componentSpacing: "&mu;m",
             valveRadius: "&mu;m",
             height: "&mu;m",
             gap: "&mu;m",
@@ -42,6 +42,7 @@ export default class Valve3D extends Template {
         };
 
         this.__minimum = {
+            componentSpacing: 0,
             valveRadius: 0.1 * 100,
             height: 0.1 * 100,
             gap: 0.5 * 10,
@@ -49,6 +50,7 @@ export default class Valve3D extends Template {
         };
 
         this.__maximum = {
+            componentSpacing: 10000,
             valveRadius: 0.2 * 10000,
             height: 1.2 * 1000,
             gap: 0.1 * 10000,
@@ -56,6 +58,7 @@ export default class Valve3D extends Template {
         };
 
         this.__featureParams = {
+            componentSpacing: "componentSpacing",
             position: "position",
             rotation: "rotation",
             radius1: "valveRadius",
@@ -65,6 +68,7 @@ export default class Valve3D extends Template {
         };
 
         this.__targetParams = {
+            componentSpacing: "componentSpacing",
             position: "position",
             rotation: "rotation",
             radius1: "valveRadius",
@@ -84,12 +88,19 @@ export default class Valve3D extends Template {
         this.__mint = "VALVE3D";
     }
 
+    getPorts(params) {
+        let ports = [];
+
+        ports.push(new ComponentPort(0, 0, "1", "CONTROL"));
+
+        return ports;
+    }
+
     __drawFlow(params) {
         let position = params["position"];
         let gap = params["gap"];
         let radius = params["valveRadius"];
         let color = params["color"];
-        let orientation = params["orientation"];
         let rotation = params["rotation"];
 
         let center = new paper.Point(position[0], position[1]);
@@ -113,7 +124,7 @@ export default class Valve3D extends Template {
         let gap = params["gap"];
         let radius = params["valveRadius"];
         let color = params["color"];
-        let orientation = params["orientation"];
+        let rotation = params["rotation"];
         let center = new paper.Point(position[0], position[1]);
         // let h0p0, h0p1, h0p2, h1p0, h1p1, h1p2;
         let circ = new paper.Path.Circle(center, radius);
@@ -121,7 +132,7 @@ export default class Valve3D extends Template {
         return circ;
     }
 
-    render2D(params, key) {
+    render2D(params, key = "FLOW") {
         if (key == "FLOW") {
             return this.__drawFlow(params);
         } else if (key == "CONTROL") {
@@ -145,11 +156,11 @@ export default class Valve3D extends Template {
         let radius = params["valveRadius"];
         let color = params["color"];
         console.log("Coloer:", color);
-        let orientation = params["orientation"];
+        let rotation = params["rotation"];
         let center = new paper.Point(position[0], position[1]);
         // let h0p0, h0p1, h0p2, h1p0, h1p1, h1p2;
         let circ = new paper.Path.Circle(center, radius);
         circ.fillColor = color;
-        return circ;
+        return circ.rotate(rotation, center);
     }
 }

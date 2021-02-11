@@ -28,6 +28,8 @@ export default class ComponentToolBar {
         this.__pumpButton = document.getElementById("pump_button");
         this.__pump3dButton = document.getElementById("pump3d_button");
         this.__portButton = document.getElementById("port_button");
+        this.__anodeButton = document.getElementById("anode_button");//CK edit
+        this.__cathodeButton = document.getElementById("cathode_button");//CK
         this.__viaButton = document.getElementById("via_button");
         this.__chamberButton = document.getElementById("chamber_button");
         this.__diamondButton = document.getElementById("diamond_button");
@@ -35,6 +37,7 @@ export default class ComponentToolBar {
         this.__curvedmixerButton = document.getElementById("curvedmixer_button");
         this.__mixerButton = document.getElementById("mixer_button");
         this.__gradientGeneratorButton = document.getElementById("gradientgenerator_button");
+        this.__thermoCyclerButton = document.getElementById("thermoCycler_button")
         this.__treeButton = document.getElementById("tree_button");
         this.__ytreeButton = document.getElementById("ytree_button");
         this.__muxButton = document.getElementById("mux_button");
@@ -42,13 +45,30 @@ export default class ComponentToolBar {
         this.__rotarymixerButton = document.getElementById("rotarymixer_button");
         this.__dropletgenButton = document.getElementById("dropletgen_button");
         this.__celltraplButton = document.getElementById("celltrapl_button");
+        this.__gelchannelButton = document.getElementById("gelchannel_button");//ck
         this.__alignmentMarksButton = document.getElementById("alignmentmarks_button");
         this.__llChamberButton = document.getElementById("llchamber_button");
         this.__threeDMixerButton = document.getElementById("3dmixer_button");
 
+        //new 
+        this.__filterButton = document.getElementById("filter_button");
+        this.__celltrapsButton = document.getElementById("celltraps_button");
+        this.__threeDMuxButton = document.getElementById("3dmux_button");
+        // this.__chemostatRingButton = document.getElementById("chemostatring_button");
+        this.__incubationButton = document.getElementById("incubation_button");
+        this.__mergerButton = document.getElementById("merger_button");
+        this.__picoinjectionButton = document.getElementById("picoinjection_button");
+        this.__sorterButton = document.getElementById("sorter_button");
+        this.__splitterButton = document.getElementById("splitter_button");
+        this.__capacitancesensorButton = document.getElementById("capacitancesensor_button");
+        this.__dropletgenTButton = document.getElementById("dropletgenT_button");
+        this.__dropletgenFlowButton = document.getElementById("dropletgenFlow_button");
+        this.__logicarrayButton = document.getElementById("logicarray_button");
+
         //Create all the parameter menu buttons
 
         this.__channelParams = document.getElementById("channel_params_button");
+        this.__thermoCyclerParams = document.getElementById("thermoCycler_params_button");
         this.__connectionParams = document.getElementById("connection_params_button");
         this.__roundedChannelParams = document.getElementById("roundedchannel_params_button");
         this.__transitionParams = document.getElementById("transition_params_button");
@@ -58,6 +78,8 @@ export default class ComponentToolBar {
         this.__pumpParams = document.getElementById("pump_params_button");
         this.__pump3dParams = document.getElementById("pump3d_params_button");
         this.__portParams = document.getElementById("port_params_button");
+        this.__anodeParams = document.getElementById("anode_params_button");//ck
+        this.__cathodeParams = document.getElementById("cathode_params_button");//ck
         this.__viaParams = document.getElementById("via_params_button");
         this.__chamberParams = document.getElementById("chamber_params_button");
         this.__diamondParams = document.getElementById("diamond_params_button");
@@ -72,11 +94,27 @@ export default class ComponentToolBar {
         this.__rotarymixerParams = document.getElementById("rotarymixer_params_button");
         this.__dropletgenParams = document.getElementById("dropletgen_params_button");
         this.__celltraplParams = document.getElementById("celltrapl_params_button");
+        this.__gelchannelParams = document.getElementById("gelchannel_params_button");//ck
         this.__alignmentMarksParams = document.getElementById("alignmentmarks_params_button");
         this.__llChamberParams = document.getElementById("llchamber_params_button");
         this.__threeDMixerParams = document.getElementById("3dmixer_params_button");
 
         this.__insertTextDialog = new InsertTextDialog();
+        
+        //new
+        this.__filterParams = document.getElementById("filter_params_button");
+        this.__celltrapsParams = document.getElementById("celltraps_params_button");
+        this.__threeDMuxParams = document.getElementById("3dmux_params_button");
+        // this.__chemostatRingParams = document.getElementById("chemostatring_params_button");
+        this.__incubationParams = document.getElementById("incubation_params_button");
+        this.__mergerParams = document.getElementById("merger_params_button");
+        this.__picoinjectionParams = document.getElementById("picoinjection_params_button");
+        this.__sorterParams = document.getElementById("sorter_params_button");
+        this.__splitterParams = document.getElementById("splitter_params_button");
+        this.__capacitancesensorParams = document.getElementById("capacitancesensor_params_button");
+        this.__dropletgenTParams = document.getElementById("dropletgenT_params_button");
+        this.__dropletgenFlowParams = document.getElementById("dropletgenFlow_params_button");
+        this.__logicarrayParams = document.getElementById("logicarray_params_button");
 
         this.buttons = {
             SelectButton: this.__selectToolButton,
@@ -87,6 +125,8 @@ export default class ComponentToolBar {
             Transition: this.__transitionButton,
             Via: this.__viaButton,
             Port: this.__portButton,
+            Anode: this.__anodeButton,//ck
+            Cathode: this.__cathodeButton,//ck
             CircleValve: this.__circleValveButton,
             Valve3D: this.__valve3dButton,
             Valve: this.__valveButton,
@@ -101,18 +141,37 @@ export default class ComponentToolBar {
             Tree: this.__treeButton,
             YTree: this.__ytreeButton,
             Mux: this.__muxButton,
+            thermoCycler: this.__thermoCyclerButton,
             Transposer: this.__transposerButton,
             RotaryMixer: this.__rotarymixerButton,
             DropletGen: this.__dropletgenButton,
             CellTrapL: this.__celltraplButton,
+            Gelchannel: this.__gelchannelButton,//ck
             AlignmentMarks: this.__alignmentMarksButton,
             LLChamber: this.__llChamberButton,
-            "3DMixer": this.__threeDMixerButton
+            "3DMixer": this.__threeDMixerButton,
+
+            //newly added part
+            Filter: this.__filterButton,
+            CellTrapS: this.__celltrapsButton,
+            "3DMux": this.__threeDMuxButton,
+            // ChemostatRing: this.__chemostatRingButton,
+            Incubation: this.__incubationButton,
+            Merger: this.__mergerButton,
+            PicoInjection: this.__picoinjectionButton,
+            Sorter: this.__sorterButton,
+            Splitter: this.__splitterButton,
+            CapacitanceSensor: this.__capacitancesensorButton,
+            DropletGenT: this.__dropletgenTButton,
+            DropletGenFlow: this.__dropletgenFlowButton,
+            LogicArray: this.__logicarrayButton
         };
+            
 
         this.__setupEventHandlers();
 
         this.__setupParamButtonEventHandlers();
+        
     }
 
     __setupEventHandlers() {
@@ -177,7 +236,7 @@ export default class ComponentToolBar {
             ref.setActiveButton("Pump3D");
             ref.__viewManagerDelegate.switchTo2D();
         };
-
+        
         this.__alignmentMarksButton.onclick = function() {
             Registry.viewManager.activateTool("AlignmentMarks");
 
@@ -198,13 +257,27 @@ export default class ComponentToolBar {
             ref.setActiveButton("Port");
             ref.__viewManagerDelegate.switchTo2D();
         };
+        
+        this.__anodeButton.onclick = function() {//ck
+            Registry.viewManager.activateTool("Anode");//ck
 
-        // this.__viaButton.onclick = function() {
-        //     Registry.viewManager.activateTool("Via");
-        //
-        //     ref.setActiveButton("Via");
-        //     ref.__viewManagerDelegate.switchTo2D();
-        // };
+            ref.setActiveButton("Anode");//ck
+            ref.__viewManagerDelegate.switchTo2D();//ck
+        };//ck
+
+        this.__cathodeButton.onclick = function() {//ck
+            Registry.viewManager.activateTool("Cathode");//ck
+
+            ref.setActiveButton("Cathode");//ck
+            ref.__viewManagerDelegate.switchTo2D();//ck
+        };//ck
+
+        this.__viaButton.onclick = function() {
+            Registry.viewManager.activateTool("Via");
+        
+            ref.setActiveButton("Via");
+            ref.__viewManagerDelegate.switchTo2D();
+        };
 
         this.__chamberButton.onclick = function() {
             Registry.viewManager.activateTool("Chamber");
@@ -249,7 +322,12 @@ export default class ComponentToolBar {
             ref.setActiveButton("GradientGenerator");
             ref.__viewManagerDelegate.switchTo2D();
         };
+        this.__thermoCyclerButton.onclick = function() {
+          Registry.viewManager.activateTool("thermoCycler");
 
+          ref.setActiveButton("thermoCycler");
+          ref.__viewManagerDelegate.switchTo2D();
+        };
         this.__treeButton.onclick = function() {
             Registry.viewManager.activateTool("Tree");
 
@@ -292,6 +370,13 @@ export default class ComponentToolBar {
             ref.setActiveButton("CellTrapL");
             ref.__viewManagerDelegate.switchTo2D();
         };
+            this.__gelchannelButton.onclick = function() {//CK
+            Registry.viewManager.activateTool("Gelchannel");//CK
+
+
+            ref.setActiveButton("Gelchannel");//CK
+            ref.__viewManagerDelegate.switchTo2D();//CK
+        };//CK
 
         this.__insertTextButton.onclick = function() {
             if (ref.activeButton) setButtonColor(ref.buttons[ref.activeButton], inactiveBackground, inactiveText);
@@ -303,6 +388,91 @@ export default class ComponentToolBar {
             Registry.viewManager.activateTool("LLChamber");
 
             ref.setActiveButton("LLChamber");
+            ref.__viewManagerDelegate.switchTo2D();
+        };
+
+        //new
+        this.__dropletgenTButton.onclick = function() {
+            Registry.viewManager.activateTool("DropletGenT");
+
+            ref.setActiveButton("DropletGenT");
+            ref.__viewManagerDelegate.switchTo2D();
+        };
+
+        this.__dropletgenFlowButton.onclick = function() {
+            Registry.viewManager.activateTool("DropletGenFlow");
+
+            ref.setActiveButton("DropletGenFlow");
+            ref.__viewManagerDelegate.switchTo2D();
+        };
+
+        this.__filterButton.onclick = function() {
+            Registry.viewManager.activateTool("Filter");
+
+            ref.setActiveButton("Filter");
+            ref.__viewManagerDelegate.switchTo2D();
+        };
+
+        this.__celltrapsButton.onclick = function() {
+            Registry.viewManager.activateTool("CellTrapS");
+
+            ref.setActiveButton("CellTrapS");
+            ref.__viewManagerDelegate.switchTo2D();
+        };
+
+        this.__threeDMuxButton.onclick = function() {
+            Registry.viewManager.activateTool("3DMux");
+
+            ref.setActiveButton("3DMux");
+            ref.__viewManagerDelegate.switchTo2D();
+        };
+
+        // this.__chemostatRingButton.onclick = function() {
+        //     Registry.viewManager.activateTool("ChemostatRing");
+
+        //     ref.setActiveButton("ChemostatRing");
+        //     ref.__viewManagerDelegate.switchTo2D();
+        // };
+        this.__incubationButton.onclick = function() {
+            Registry.viewManager.activateTool("Incubation");
+
+            ref.setActiveButton("Incubation");
+            ref.__viewManagerDelegate.switchTo2D();
+        };
+        this.__mergerButton.onclick = function() {
+            Registry.viewManager.activateTool("Merger");
+
+            ref.setActiveButton("Merger");
+            ref.__viewManagerDelegate.switchTo2D();
+        };
+        this.__picoinjectionButton.onclick = function() {
+            Registry.viewManager.activateTool("PicoInjection");
+
+            ref.setActiveButton("PicoInjection");
+            ref.__viewManagerDelegate.switchTo2D();
+        };
+        this.__sorterButton.onclick = function() {
+            Registry.viewManager.activateTool("Sorter");
+
+            ref.setActiveButton("Sorter");
+            ref.__viewManagerDelegate.switchTo2D();
+        };
+        this.__splitterButton.onclick = function() {
+            Registry.viewManager.activateTool("Splitter");
+
+            ref.setActiveButton("Splitter");
+            ref.__viewManagerDelegate.switchTo2D();
+        };
+        this.__capacitancesensorButton.onclick = function() {
+            Registry.viewManager.activateTool("CapacitanceSensor");
+
+            ref.setActiveButton("CapacitanceSensor");
+            ref.__viewManagerDelegate.switchTo2D();
+        };
+        this.__logicarrayButton.onclick = function() {
+            Registry.viewManager.activateTool("LogicArray");
+
+            ref.setActiveButton("LogicArray");
             ref.__viewManagerDelegate.switchTo2D();
         };
     }
@@ -335,6 +505,8 @@ export default class ComponentToolBar {
         this.__pump3dParams.onclick = ComponentToolBar.getParamsWindowCallbackFunction("Pump3D", "Basic");
         this.__pumpParams.onclick = ComponentToolBar.getParamsWindowCallbackFunction("Pump", "Basic");
         this.__portParams.onclick = ComponentToolBar.getParamsWindowCallbackFunction("Port", "Basic");
+        this.__anodeParams.onclick = ComponentToolBar.getParamsWindowCallbackFunction("Anode", "Basic");//ck
+        this.__cathodeParams.onclick = ComponentToolBar.getParamsWindowCallbackFunction("Cathode", "Basic");//ck
         // this.__viaParams.onclick = ComponentToolBar.getParamsWindowCallbackFunction("Via", "Basic");
         this.__chamberParams.onclick = ComponentToolBar.getParamsWindowCallbackFunction("Chamber", "Basic");
         this.__diamondParams.onclick = ComponentToolBar.getParamsWindowCallbackFunction("DiamondReactionChamber", "Basic");
@@ -350,9 +522,25 @@ export default class ComponentToolBar {
         this.__dropletgenParams.onclick = ComponentToolBar.getParamsWindowCallbackFunction("DropletGen", "Basic");
         this.__transitionParams.onclick = ComponentToolBar.getParamsWindowCallbackFunction("Transition", "Basic");
         this.__celltraplParams.onclick = ComponentToolBar.getParamsWindowCallbackFunction("CellTrapL", "Basic");
+        this.__gelchannelParams.onclick = ComponentToolBar.getParamsWindowCallbackFunction("Gelchannel", "Basic");//ck
         this.__alignmentMarksParams.onclick = ComponentToolBar.getParamsWindowCallbackFunction("AlignmentMarks", "Basic");
         this.__llChamberParams.onclick = ComponentToolBar.getParamsWindowCallbackFunction("LLChamber", "Basic");
         this.__threeDMixerParams.onclick = ComponentToolBar.getParamsWindowCallbackFunction("3DMixer", "Basic");
+
+        //new
+        this.__filterParams.onclick = ComponentToolBar.getParamsWindowCallbackFunction("Filter", "Basic");
+        this.__celltrapsParams.onclick = ComponentToolBar.getParamsWindowCallbackFunction("CellTrapS", "Basic");
+        this.__threeDMuxParams.onclick = ComponentToolBar.getParamsWindowCallbackFunction("3DMux", "Basic");
+        // this.__chemostatRingParams.onclick = ComponentToolBar.getParamsWindowCallbackFunction("ChemostatRing", "Basic");
+        this.__incubationParams.onclick = ComponentToolBar.getParamsWindowCallbackFunction("Incubation", "Basic");
+        this.__mergerParams.onclick = ComponentToolBar.getParamsWindowCallbackFunction("Merger", "Basic");
+        this.__picoinjectionParams.onclick = ComponentToolBar.getParamsWindowCallbackFunction("PicoInjection", "Basic");
+        this.__sorterParams.onclick = ComponentToolBar.getParamsWindowCallbackFunction("Sorter", "Basic");
+        this.__splitterParams.onclick = ComponentToolBar.getParamsWindowCallbackFunction("Splitter", "Basic");
+        this.__capacitancesensorParams.onclick = ComponentToolBar.getParamsWindowCallbackFunction("CapacitanceSensor", "Basic");
+        this.__dropletgenTParams.onclick = ComponentToolBar.getParamsWindowCallbackFunction("DropletGenT", "Basic");
+        this.__dropletgenFlowParams.onclick = ComponentToolBar.getParamsWindowCallbackFunction("DropletGenFlow", "Basic");
+        this.__logicarrayParams.onclick = ComponentToolBar.getParamsWindowCallbackFunction("LogicArray", "Basic");
     }
 
     static getParamsWindowCallbackFunction(typeString, setString, isTranslucent = false) {
