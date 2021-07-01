@@ -4,6 +4,7 @@ import ComponentPort from "./componentPort";
 
 import * as Registry from "./registry";
 import * as FeatureRenderer2D from "../view/render2D/featureRenderer2D";
+import Port from "../library/port";
 
 /**
  * This class contains the component abstraction used in the interchange format and the
@@ -12,11 +13,11 @@ import * as FeatureRenderer2D from "../view/render2D/featureRenderer2D";
 export default class Component {
     /**
      * Default Constructor
-     * @param type
-     * @param params
-     * @param name
-     * @param mint
-     * @param id
+     * @param {string} type
+     * @param {Params} params
+     * @param {String} name
+     * @param {string} mint
+     * @param {String} id
      */
     constructor(type, params, name, mint, id = Component.generateID()) {
         if (params instanceof Params) {
@@ -37,6 +38,10 @@ export default class Component {
         this.__ports = new Map();
         this._componentPortTRenders = new Map();
 
+        // TODO - Figure out how to use this for generic components
+        this._xspan = 0;
+        this._yspan = 0;
+
         //Create and set the ports here itself
 
         let cleanparamdata = {};
@@ -51,26 +56,45 @@ export default class Component {
             }
         }
     }
-
+    /**
+     * Gets the ports of the component
+     * @returns {Port} Returns ports of the component
+     * @memberof Component
+     */
     get ports() {
         return this.__ports;
     }
-
+    /**
+     * Sets the port of the component
+     * @param {} value
+     * @returns {void}
+     * @memberof Component
+     */
     set ports(value) {
         this.__ports = value;
     }
-
+    /**
+     * Gets the place of the component
+     * @returns {Number} Returns the place of the component
+     * @memberof Component
+     */
     get placed() {
         return this.__placed;
     }
-
+    /**
+     * Sets the place 
+     * @param {Number} value
+     * @returns {void}
+     * @memberof Component
+     */
     set placed(value) {
         this.__placed = value;
     }
 
     /**
      * Returns an array of strings that are the feature ids of the component
-     * @return {Array}
+     * @return {Array} Returns an array with the features
+     * @memberof Component
      */
     get features() {
         return this.__features;
@@ -79,6 +103,7 @@ export default class Component {
     /**
      * Generates a random id
      * @returns {String} Random ID string
+     * @memberof component
      */
     static generateID() {
         return Registry.generateID();
@@ -86,7 +111,9 @@ export default class Component {
 
     /**
      * Sets the bounds i.e. the x,y position and the width and length of the component
-     * @param bounds PaperJS Rectangle object associated with a Path.bounds property
+     * @param {Object} bounds PaperJS Rectangle object associated with a Path.bounds property
+     * @memberof Component
+     * @returns {void}
      */
     setBounds(bounds) {
         this.__bounds = bounds;
@@ -98,8 +125,10 @@ export default class Component {
 
     /**
      * Updates the parameters stored by the component
-     * @param key
-     * @param value
+     * @param {String} key Key to identify the parameter
+     * @param {} value New value to be assign in the feature
+     * @memberof Component
+     * @returns {void}
      */
     updateParameter(key, value) {
         this.__params.updateParameter(key, value);
@@ -118,7 +147,8 @@ export default class Component {
 
     /**
      * Generates the object that needs to be serialzed into JSON for interchange format V1
-     * @returns {{}} Object
+     * @returns {Object} Object
+     * @memberof Component
      */
     toInterchangeV1() {
         let output = {};
@@ -127,8 +157,8 @@ export default class Component {
         output.entity = this.__entity;
         output.params = this.__params.toJSON();
         let bounds = this.getBoundingRectangle();
-        output.xspan = bounds.width;
-        output.yspan = bounds.height;
+        output["x-span"] = bounds.width;
+        output["y-span"] = bounds.height;
         let portdata = [];
         let map = this.ports;
         if (map != null) {
@@ -139,12 +169,32 @@ export default class Component {
         }
 
         output.ports = portdata;
+        output.layers = this.__findLayerReferences();
         return output;
+    }
+
+    __findLayerReferences(){
+        let layers = Registry.currentDevice.getLayers();
+        let layerrefs = [];
+        let layer;
+        for(let i in layers){
+            layer = layers[i];
+            //Check if the component is in layer then put it there
+            let feature;
+            for(let key in layer.features){
+                feature = layer.features[key];
+                if(feature.referenceID == this.getID()){
+                    layerrefs.push(layer.id);
+                }
+            }
+        }
+        return layerrefs;
     }
 
     /**
      * Returns the ID of the component
-     * @returns {String|*}
+     * @returns {string|*}
+     * @memberof Component
      */
     getID() {
         return this.__id;
@@ -152,7 +202,10 @@ export default class Component {
 
     /**
      * Allows the user to set the name of the component
-     * @param name
+     * @param {string} name
+     * @returns {void}
+     * @memberof Component
+     * 
      */
     setName(name) {
         this.__name = name;
@@ -160,7 +213,8 @@ export default class Component {
 
     /**
      * Returns the name of the component
-     * @returns {String}
+     * @returns {string}
+     * @memberof Component
      */
     getName() {
         return this.__name;
@@ -169,24 +223,27 @@ export default class Component {
     /**
      * Gets the 3DuF Type of the component, this will soon be depreciated and merged with
      * the MINT references
-     * @returns {*}
+     * @returns {string} Returns the type of component
+     * @memberof Component
      */
     getType() {
         return this.__type;
     }
 
     /**
-     * Returns the position of the component
-     * @return {*|string}
+     * Returns an Array of size two containing the X and Y coordinates
+     * @return {Array<number>}
+     * @memberof Component
      */
     getPosition() {
         return this.__params.getValue("position");
     }
 
     /**
-     * Returns the value of the parameter stored against the following key in teh component params
-     * @param key
-     * @returns {*}
+     * Returns the value of the parameter stored against the following key in the component params
+     * @param {string} key Key to access the value
+     * @returns {*} Returns the value or an error
+     * @memberof Component
      */
     getValue(key) {
         try {
@@ -197,18 +254,21 @@ export default class Component {
     }
 
     /**
-     * Returns the list of feature ids that are associated with this
+     * Gets the list of feature ids that are associated with this
      * component
-     * @return {Array}
+     * @return {Array|*} Returns an array with the correspondings features of the component
+     * @memberof Component
+     * 
      */
     getFeatureIDs() {
         return this.__features;
     }
 
     /**
-     * Not sure what this does
-     * @param key
-     * @returns {boolean}
+     * Checks if the component has default parameters
+     * @param {String} key Key to access the component
+     * @returns {boolean} Returns true whether it has default parameters or not
+     * @memberof Component
      */
     hasDefaultParam(key) {
         if (this.getDefaults().hasOwnProperty(key)) return true;
@@ -217,7 +277,9 @@ export default class Component {
 
     /**
      * Adds a feature that is associated with the component
-     * @param featureID String id of the feature
+     * @param {String} featureID String id of the feature
+     * @memberof Component
+     * @returns {void}
      */
     addFeatureID(featureID) {
         if (typeof featureID != "string" && !(featureID instanceof String)) {
@@ -231,6 +293,8 @@ export default class Component {
     /**
      * This method updates the bounds of the component
      * @private
+     * @memberof Component
+     * @returns {void}
      */
     __updateBounds() {
         let bounds = null;
@@ -253,8 +317,9 @@ export default class Component {
     }
 
     /**
-     * Returns the params associated with the component
-     * @return {Params}
+     * Gets the params associated with the component
+     * @return {Params} Returns the params associated with the component
+     * @memberof Component
      */
     getParams() {
         return this.__params;
@@ -262,7 +327,8 @@ export default class Component {
 
     /**
      * Returns a paper.Rectangle object that defines the bounds of the component
-     * @return {*}
+     * @return {Object}
+     * @memberof Component
      */
     getBoundingRectangle() {
         if (this.features.length == 0 || this.features == null || this.features == undefined) {
@@ -284,7 +350,9 @@ export default class Component {
 
     /**
      * Updates the coordinates of the component and all the other features
-     * @param center
+     * @param {Array} center
+     * @memberof Component
+     * @returns {void}
      */
     updateComponetPosition(center) {
         //This was not calling the right method earlier
@@ -300,10 +368,11 @@ export default class Component {
 
     /**
      * Replicates the component at the given positions
-     * @param xpos Integer location of X
-     * @param ypos Integer location of Y
-     * @param name
+     * @param {Number} xpos Integer location of X
+     * @param {Number} ypos Integer location of Y
+     * @param {string} name Name of the replicated component
      * @return {Component}
+     * @memberof Component
      */
     replicate(xpos, ypos, name = Registry.currentDevice.generateNewName(this.__type)) {
         //TODO: Fix this ridiculous chain of converting params back and forth, there should be an easier way
@@ -341,7 +410,8 @@ export default class Component {
 
     /**
      * Returns the center position of the component as a 2D vector
-     * @return {*[]}
+     * @return {Array}
+     * @memberof Component
      */
     getCenterPosition() {
         let bounds = this.getBoundingRectangle();
@@ -350,7 +420,8 @@ export default class Component {
 
     /**
      * Returns the topleft position of the component as a 2D vector
-     * @return {*[]}
+     * @return {Array}
+     * @memberof Component
      */
     getTopLeftPosition() {
         let bounds = this.getBoundingRectangle();
@@ -359,8 +430,9 @@ export default class Component {
 
     /**
      * This method is used to import the component from Interchange V1 JSON
-     * @param json
+     * @param {} json
      * @returns {*}
+     * @memberof component
      */
     static fromInterchangeV1(json) {
         // let set;
@@ -372,6 +444,9 @@ export default class Component {
         let name = json.name;
         let id = json.id;
         let entity = json.entity;
+        this.xspan = this._xspan;
+        this.yspan = this._yspan;
+
         let params = {};
         if (entity === "TEST MINT") {
             console.warn("Found legacy invalid entity string", entity);
@@ -388,6 +463,9 @@ export default class Component {
             definition = CustomComponent.defaultParameterDefinitions();
         } else {
             definition = Registry.featureSet.getDefinition(entity);
+            if(definition === null){
+                throw Error("Could not find definition for type: "+ entity);
+            }
         }
 
         // console.log(definition);
@@ -431,11 +509,21 @@ export default class Component {
 
         return component;
     }
-
+    /**
+     * Set port for the component
+     * @param {string} label 
+     * @param {Port} port 
+     * @memberof Component
+     * @returns {void}
+     */
     setPort(label, port) {
         this.__ports.set(label, port);
     }
-
+    /**
+     * Gets the rotation of the component
+     * @returns {Number} Returns the degree of rotation
+     * @memberof Component
+     */
     getRotation() {
         if (this.__params.hasParam("rotation")) {
             return this.getValue("rotation");
@@ -451,13 +539,21 @@ export default class Component {
             return 0;
         }
     }
-
+    /**
+     * 
+     * @param {string} label 
+     * @param {*} render 
+     * @returns {void}
+     * @memberof Component
+     */
     attachComponentPortRender(label, render) {
         this._componentPortTRenders.set(label, render);
     }
 
     /**
      * Updates the Component Ports to have the latest location information
+     * @memberof Component
+     * @returns {void}
      */
     updateComponentPorts() {
         //updating the Component Ports

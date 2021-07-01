@@ -4,17 +4,64 @@ import TextFeature from "./textFeature";
 import Params from "./params";
 
 import * as Registry from "./registry";
-
+/**
+ * Layer class
+ */
 export default class Layer {
-    constructor(values, name = "New Layer") {
+    /**
+     * Default Constructor for the layer
+     * @param {*} values Value of the layer
+     * @param {String} name Name of the layer
+     */
+    constructor(values, id = Layer.generateID(), name = "New Layer", type = "FLOW", group = "0") {
+        if (!values.hasOwnProperty("flip")) {
+            values["flip"] = false;
+        }
+        if (!values.hasOwnProperty("z_offset")) {
+            values["z_offset"] = 0;
+        }
         this.params = new Params(values, Layer.getUniqueParameters(), Layer.getHeritableParameters());
         this.name = String(name);
         this.features = {};
         this.featureCount = 0;
         this.device = undefined;
         this.color = undefined;
+        if (type == "FLOW") {
+            this.color = "indigo";
+            this.params.updateParameter("flip", false);
+        } else if (type == "CONTROL") {
+            this.color = "red";
+            this.params.updateParameter("flip", true);
+        } else if (type == "INTEGRATION") {
+            this.color = "gold";
+            this.params.updateParameter("flip", false);
+        }
+        this.__id = id;
+        this.__type = type;
+        this.group = group;
     }
 
+    get type() {
+        return this.__type;
+    }
+
+    get id() {
+        return this.__id;
+    }
+
+    /**
+     * Generates a random id
+     * @returns {String} Random ID string
+     */
+    static generateID() {
+        return Registry.generateID();
+    }
+    /**
+     * Adds a feature to the layer
+     * @param {Feature} feature Feature to pass to add to the layer
+     * @memberof Layer
+     * @returns {void}
+     */
     addFeature(feature) {
         this.__ensureIsAFeature(feature);
         this.features[feature.getID()] = feature;
@@ -22,17 +69,32 @@ export default class Layer {
         feature.layer = this;
         if (Registry.viewManager) Registry.viewManager.addFeature(feature);
     }
-
+    /**
+     * Selects a parameter corresponding to the key identifier and assigns it to the new value
+     * @param {String} key Key to identify the parameter
+     * @param {*} value Value to be assing to the parameter
+     * @memberof Layer
+     * @returns {void}
+     */
     updateParameter(key, value) {
         this.params.updateParameter(key, value);
         if (Registry.viewManager) Registry.viewManager.updateLayer(this);
     }
-
+    /**
+     * Sets color for the layer
+     * @param {String} layerColor
+     * @memberof Layer
+     * @returns {void}
+     */
     setColor(layerColor) {
         this.color = layerColor;
         if (Registry.viewManager) Registry.viewManager.updateLayer(this);
     }
-
+    /**
+     * Returns index of layer
+     * @returns {Number}
+     * @memberof Layer
+     */
     getIndex() {
         if (this.device) return this.device.layers.indexOf(this);
     }
@@ -59,41 +121,84 @@ export default class Layer {
         return 0;
     }
 */
+
+    /**
+     * Checks whether the argument pass is a feature
+     * @param {Feature} feature Feature object
+     * @memberof Layer
+     * @returns {void}
+     */
     __ensureIsAFeature(feature) {
         if (!(feature instanceof Feature) && !(feature instanceof TextFeature) && !(feature instanceof EdgeFeature)) {
             throw new Error("Provided value" + feature + " is not a Feature! Did you pass an ID by mistake?");
         }
     }
-
+    /**
+     * Checks whether the feature already exist
+     * @param {Feature} feature Feature object
+     * @memberof Layer
+     * @returns {void}
+     */
     __ensureFeatureExists(feature) {
         if (!this.containsFeature(feature)) throw new Error("Layer does not contain the specified feature!");
     }
-
+    /**
+     * Checks if feature exist based on it's ID
+     * @param {String} featureID ID of the feature to search for
+     * @memberof Layer
+     * @returns {void}
+     */
     __ensureFeatureIDExists(featureID) {
         if (!this.containsFeatureID(featureID)) throw new Error("Layer does not contain a feature with the specified ID!");
     }
-
+    /**
+     * Returns unique parameters
+     * @returns {Params}
+     * @memberof Layer
+     * @returns {void}
+     */
     static getUniqueParameters() {
         return {
             z_offset: "Float",
             flip: "Boolean"
         };
     }
-
+    /**
+     * Returns heritable parameters
+     * @returns {Array<Params>}
+     * @memberof Layer
+     * @returns {void}
+     */
     static getHeritableParameters() {
         return {};
     }
-
+    /**
+     * Returns feature based on it's ID
+     * @param {String} featureID
+     * @returns {Feature}
+     * @memberof Layer
+     */
     getFeature(featureID) {
         this.__ensureFeatureIDExists(featureID);
         return this.features[featureID];
     }
-
+    /**
+     * Removes selected feature
+     * @param {Feature} feature Feature object
+     * @memberof Layer
+     * @returns {void}
+     */
     removeFeature(feature) {
         this.removeFeatureByID(feature.getID());
     }
 
     //TODO: Stop using delete, it's slow!
+    /**
+     * Removes a feature by passing it's ID as a parameter
+     * @param {string} featureID ID of the feature
+     * @memberof Layer
+     * @returns {void}
+     */
     removeFeatureByID(featureID) {
         this.__ensureFeatureIDExists(featureID);
         let feature = this.features[featureID];
@@ -101,18 +206,38 @@ export default class Layer {
         if (Registry.viewManager) Registry.viewManager.removeFeature(feature);
         delete this.features[featureID];
     }
-
+    /**
+     * Checks if object contains a feature
+     * @param {Feature} feature Feature object
+     * @returns {Boolean} true if it has the feature
+     * @memberof Layer
+     */
     containsFeature(feature) {
         this.__ensureIsAFeature(feature);
         return this.features.hasOwnProperty(feature.getID());
     }
-
+    /**
+     * Checks if object contains a feature based on the feature's ID
+     * @param {String} featureID ID of the feature to search for
+     * @returns {Boolean} true if it has the feature
+     * @memberof Layer
+     */
     containsFeatureID(featureID) {
         return this.features.hasOwnProperty(featureID);
     }
+    /**
+     * Gets all features from the layers
+     * @returns {Array} Returns all features from the layers
+     * @memberof Layer
+     */
     getAllFeaturesFromLayer() {
         return this.features;
     }
+    /**
+     * Render all the features in 2D
+     * @returns {Array} Returns array with the renders of the features in 2D
+     * @memberof Layer
+     */
     __renderFeatures2D() {
         let output = [];
         for (let i in this.features) {
@@ -120,7 +245,11 @@ export default class Layer {
         }
         return output;
     }
-
+    /**
+     * Convers features to JSON format
+     * @returns {JSON} Returns a JSON format with the features in a JSON format
+     * @memberof Layer
+     */
     __featuresToJSON() {
         let output = {};
         for (let i in this.features) {
@@ -128,7 +257,11 @@ export default class Layer {
         }
         return output;
     }
-
+    /**
+     * Converts features to Interchange format
+     * @returns {Array} Returns an array with the features in Interchange format
+     * @memberof Layer
+     */
     __featuresInterchangeV1() {
         let output = {};
         for (let i in this.features) {
@@ -136,13 +269,21 @@ export default class Layer {
         }
         return output;
     }
-
+    /**
+     * Loads features from JSON format
+     * @param {JSON} json JSON format file
+     * @memberof Layer
+     */
     __loadFeaturesFromJSON(json) {
         for (let i in json) {
             this.addFeature(Feature.fromJSON(json[i]));
         }
     }
-
+    /**
+     * Loads features from Interchange format
+     * @param {*} json Interchange format file
+     * @memberof Layer
+     */
     __loadFeaturesFromInterchangeV1(json) {
         for (let i in json) {
             this.addFeature(Feature.fromInterchangeV1(json[i]));
@@ -150,6 +291,11 @@ export default class Layer {
     }
 
     //TODO: Replace Params and remove static method
+    /**
+     * Converts the attributes of the object into a JSON format
+     * @returns {JSON} Returns a JSON format with the attributes of the object
+     * @memberof Layer
+     */
     toJSON() {
         let output = {};
         output.name = this.name.toJSON();
@@ -158,8 +304,31 @@ export default class Layer {
         output.features = this.__featuresToJSON();
         return output;
     }
-
+    /**
+     * Converts the attributes of the object into Interchange format
+     * @returns {*} Returns a Interchange format with the attributes of the object
+     * @memberof Layer
+     */
     toInterchangeV1() {
+        let output = {};
+        output.id = this.__id;
+        output.name = this.name;
+        output.type = this.type;
+        // TODO - Add group and unique name parameters to the system and do type checking
+        // against type and not name in the future
+        output.group = "0";
+        output.params = this.params.toJSON();
+        return output;
+    }
+
+    /**
+     * Generate the feature layer json that is neccissary for
+     * seriailizing the visual of the 3DuF designs
+     *
+     * @returns {*} json of the features
+     * @memberof Layer
+     */
+    toFeatureLayerJSON() {
         let output = {};
         output.name = this.name;
         output.color = this.color;
@@ -168,27 +337,55 @@ export default class Layer {
         return output;
     }
 
+    /**
+     * Load from a JSON format a new layer object
+     * @param {JSON} json JSON format
+     * @returns {Layer} Returns a new layer object
+     * @memberof Layer
+     */
     static fromJSON(json) {
         if (!json.hasOwnProperty("features")) {
             throw new Error("JSON layer has no features!");
         }
-        let newLayer = new Layer(json.params, json.name);
+        let newLayer = new Layer(json.params, json.id, json.name);
         newLayer.__loadFeaturesFromJSON(json.features);
         if (json.color) newLayer.color = json.color;
         return newLayer;
     }
 
-    static fromInterchangeV1(json) {
-        //TODO: Need to be able to through all the features in the layer
-        if (!json.hasOwnProperty("features")) {
-            throw new Error("JSON layer has no features!");
-        }
-        let newLayer = new Layer(json.params, json.name);
+    /**
+     * Loads the layer object from the interchange format
+     *
+     * @static
+     * @param {*} json
+     * @returns
+     * @memberof Layer
+     */
+    static loadFromInterchangeV1(json) {
+        let newLayer = new Layer(json.params, json.id, json.name, json.type, json.group);
+        return newLayer;
+    }
+
+    /**
+     * Load from an Interchange format all the features for the layer object
+     * @param {*} json
+     * @returns {Layer} Returns a new layer object
+     * @memberof Layer
+     */
+    static loadFeaturesFromInterchangeV1(json) {
+        // let newLayer = new Layer(json.params, json.name, json.type, json.group);
+        //Get layer from registry
+        // Registry.currentDevice.layer
         newLayer.__loadFeaturesFromInterchangeV1(json.features);
         if (json.color) newLayer.color = json.color; //TODO: Figure out if this needs to change in the future
         return newLayer;
     }
-
+    /**
+     * Render in 2D the features
+     * @param {*} paperScope
+     * @returns {Feature} Returns the renders
+     * @memberof Layer
+     */
     render2D(paperScope) {
         return this.__renderFeatures2D();
     }
